@@ -7,6 +7,8 @@ import (
 	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/repositories"
 	"github.com/RomainC75/todo2/data/models"
+	"github.com/RomainC75/todo2/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserSrv struct {
@@ -26,14 +28,18 @@ func (userSrv *UserSrv) CreateUserSrv(user requests.SignupRequest) (models.User,
 		return models.User{}, errors.New("email already used")
 	}
 
-	userModel := models.User{
-		Email:    user.Email,
-		Password: user.Password,
+	b, err := bcrypt.GenerateFromPassword([]byte(user.Password), 5)
+	if err != nil {
+		return models.User{}, errors.New("error trying to encrypt the password")
 	}
 
-	fmt.Printf("............")
+	userModel := models.User{
+		Email:    user.Email,
+		Password: string(b),
+	}
 
 	createdUser, err := userSrv.userRepository.CreateUser(userModel)
+	utils.PrettyDisplay("createdUser", createdUser)
 	if err != nil {
 		return models.User{}, err
 	}
