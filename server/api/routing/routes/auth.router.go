@@ -10,6 +10,6 @@ func AuthRoutes(router *gin.Engine) {
 
 	authGroup := router.Group("/auth")
 	{
-		authGroup.GET("/signup", authController.HandleSignup)
+		authGroup.POST("/signup", authController.HandleSignup)
 	}
 }

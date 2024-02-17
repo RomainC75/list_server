@@ -20,12 +20,16 @@ func NewAuthCtrl() *AuthCtrl {
 
 func (authCtrl *AuthCtrl) HandleSignup(c *gin.Context) {
 	var newUser requests.SignupRequest
-
 	if err := c.ShouldBind(&newUser); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
 	}
 
-	authCtrl.userSrv.CreateUserSrv(newUser)
+	createdUser, err := authCtrl.userSrv.CreateUserSrv(newUser)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
 
-	c.JSON(http.StatusAccepted, gin.H{"user": newUser})
+	c.JSON(http.StatusAccepted, gin.H{"user": createdUser})
 }
