@@ -15,4 +15,5 @@ db:
 
 jwt:
   secret: "azerty"
+  jwtValidityTime: 15
 

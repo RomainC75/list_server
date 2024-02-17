@@ -25,5 +25,6 @@ type DB struct {
 }
 
 type Jwt struct {
-	Secret string
+	Secret          string
+	JwtValidityTime int
 }

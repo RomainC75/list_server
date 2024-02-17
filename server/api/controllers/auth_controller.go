@@ -25,11 +25,27 @@ func (authCtrl *AuthCtrl) HandleSignup(c *gin.Context) {
 		return
 	}
 
-	createdUser, err := authCtrl.userSrv.CreateUserSrv(newUser)
+	err := authCtrl.userSrv.CreateUserSrv(newUser)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{"user": createdUser})
+	c.JSON(http.StatusAccepted, gin.H{"user created": newUser.Email})
+}
+
+func (authCtrl *AuthCtrl) HandleLogin(c *gin.Context) {
+	var loginInfos requests.LoginRequest
+	if err := c.ShouldBind(&loginInfos); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	loginResponse, err := authCtrl.userSrv.LoginUserSrv(loginInfos)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusUnprocessableEntity, gin.H{"authentication details": loginResponse})
 }
