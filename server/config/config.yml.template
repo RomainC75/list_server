@@ -1,0 +1,18 @@
+app:
+  name: "todo"
+
+server:
+  host: "localhost"
+  port: "5000"
+
+db:
+  username: "name"
+  password: "pass"
+  host: "localhost"
+  # host: "db"
+  port: "5432"
+  name: "test"
+
+jwt:
+  secret: "azerty"
+
