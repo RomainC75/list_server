@@ -1,9 +1,9 @@
 package bootstrap
 
 import (
+	Routing "github.com/RomainC75/todo2/api/routing"
 	"github.com/RomainC75/todo2/config"
 	"github.com/RomainC75/todo2/data/database"
-	// Routing "github.com/RomainC75/todo2/api/routing"
 )
 
 func Serve() {
@@ -11,9 +11,9 @@ func Serve() {
 
 	database.Connect()
 
-	// Routing.Init()
+	Routing.Init()
 
-	// Routing.RegisterRoutes()
+	Routing.RegisterRoutes()
 
-	// Routing.Serve()
+	Routing.Serve()
 }
