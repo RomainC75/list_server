@@ -1,9 +1,7 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
-	"reflect"
 
 	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/dto/responses"
@@ -57,7 +55,6 @@ func (AuthCtrl *AuthCtrl) HandleVerify(c *gin.Context) {
 	id, _ := c.Get("user_id")
 	email, _ := c.Get("user_email")
 
-	fmt.Println("==========>Hanfler", reflect.TypeOf(id))
 	verifyResponse := responses.AuthVerifyResponse{
 		Id:    id.(float64),
 		Email: email.(string),

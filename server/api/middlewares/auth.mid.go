@@ -37,7 +37,7 @@ func IsAuth(isSocket bool) gin.HandlerFunc {
 		utils.PrettyDisplay("CLAIMS", claims)
 
 		c.Set("user_email", claims["email"])
-		c.Set("user_id", claims["id"])
+		c.Set("user_id", uint(claims["id"].(float64)))
 		c.Next()
 	}
 }

@@ -20,7 +20,6 @@ func NewUserRepo() *UserRepository {
 }
 
 func (userRepo *UserRepository) CreateUser(user models.User) (models.User, error) {
-	fmt.Println("try to find")
 	var newUser models.User
 	if result := userRepo.DB.Create(&user).Scan(&newUser); result.RowsAffected == 0 {
 		fmt.Println("affected rows : ", result.RowsAffected)
