@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+
 	"github.com/RomainC75/todo2/config"
 	"github.com/golang-jwt/jwt"
 )
@@ -21,11 +23,31 @@ func NewRefreshToken(claims jwt.StandardClaims) (string, error) {
 	return refreshToken.SignedString([]byte(config.Get().Jwt.Secret))
 }
 
-func ParseAccessToken(accessToken string) *UserClaims {
-	parsedAccessToken, _ := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
+func ParseAccessToken(accessToken string) (*jwt.Claims, error) {
+	parsedAccessToken, err := jwt.ParseWithClaims(accessToken, &UserClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(config.Get().Jwt.Secret), nil
 	})
-	return parsedAccessToken.Claims.(*UserClaims)
+	if err != nil {
+		return nil, err
+	}
+	return &parsedAccessToken.Claims, nil
+}
+
+func GetClaimsFromToken(tokenString string) (jwt.MapClaims, error) {
+	secret := config.Get().Jwt.Secret
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(secret), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims, nil
+	}
+	return nil, err
 }
 
 func ParseRefreshToken(refreshToken string) *jwt.StandardClaims {

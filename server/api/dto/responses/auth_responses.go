@@ -5,3 +5,8 @@ type AuthLoginResponse struct {
 	Email string `json:"email"`
 	Token string `json:"token"`
 }
+
+type AuthVerifyResponse struct {
+	Id    float64 `json:"id"`
+	Email string  `json:"email"`
+}
