@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/RomainC75/todo2/api/middlewares"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterRoutes(router *gin.Engine) {
-	// router.Use(middlewares.CORSMiddleware())
+	router.Use(middlewares.CORSMiddleware())
 	AuthRoutes(router)
 	ListRoutes(router)
 

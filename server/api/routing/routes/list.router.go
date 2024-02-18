@@ -9,8 +9,11 @@ import (
 func ListRoutes(router *gin.Engine) {
 	listController := controllers.NewListCtrl()
 
-	authGroup := router.Group("/list")
+	listGroup := router.Group("/list")
 	{
-		authGroup.POST("/", middlewares.IsAuth(false), listController.HandleCreateList)
+		listGroup.POST("/", middlewares.IsAuth(false), listController.HandleCreateList)
+		listGroup.GET("/", middlewares.IsAuth(false), listController.HandleGetListsFromUser)
+		listGroup.GET("/:listId", middlewares.IsAuth(false), listController.HandleGetList)
+		listGroup.PUT("/:listId", middlewares.IsAuth(false), listController.HandleGetList)
 	}
 }
