@@ -47,3 +47,28 @@ func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (models.Lis
 
 	return foundList, nil
 }
+
+func (listSrv *ListSrv) UpdateList(userId uint, list requests.UpdateListRequest) (models.List, error) {
+	updatedList, err := listSrv.listRepository.UpdateList(userId, list)
+	if err != nil {
+		return models.List{}, err
+	}
+	return updatedList, nil
+}
+
+func (listSrv *ListSrv) DeleteList(userId uint, listId uint) (models.List, error) {
+	foundList, err := listSrv.listRepository.GetListById(listId)
+	if err != nil {
+		return models.List{}, nil
+	}
+
+	if foundList.UserRefer != userId {
+		return models.List{}, errors.New("not the owner of this list")
+	}
+
+	deleteList, err := listSrv.listRepository.DeleteList(listId)
+	if err != nil {
+		return models.List{}, err
+	}
+	return deleteList, nil
+}

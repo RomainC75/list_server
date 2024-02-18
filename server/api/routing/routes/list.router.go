@@ -14,6 +14,7 @@ func ListRoutes(router *gin.Engine) {
 		listGroup.POST("/", middlewares.IsAuth(false), listController.HandleCreateList)
 		listGroup.GET("/", middlewares.IsAuth(false), listController.HandleGetListsFromUser)
 		listGroup.GET("/:listId", middlewares.IsAuth(false), listController.HandleGetList)
-		listGroup.PUT("/:listId", middlewares.IsAuth(false), listController.HandleGetList)
+		listGroup.PUT("/:listId", middlewares.IsAuth(false), listController.HandleUpdateList)
+		listGroup.DELETE("/:listId", middlewares.IsAuth(false), listController.HandleDeleteList)
 	}
 }

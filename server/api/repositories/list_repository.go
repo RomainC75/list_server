@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/data/database"
 	"github.com/RomainC75/todo2/data/models"
 	"gorm.io/gorm"
@@ -40,4 +41,34 @@ func (listRepo *ListRepository) GetListById(listId uint) (models.List, error) {
 		return models.List{}, errors.New("not found")
 	}
 	return foundList, nil
+}
+
+func (listRepo *ListRepository) UpdateList(userId uint, list requests.UpdateListRequest) (models.List, error) {
+	var foundList models.List
+	if result := listRepo.DB.Where("id = ?", list.Id).First(&foundList); result.RowsAffected == 0 {
+		return models.List{}, errors.New("not found")
+	}
+	if foundList.UserRefer != userId {
+		return models.List{}, errors.New("not authorized")
+	}
+
+	// result := listRepo.DB.Save(&foundList)
+	// if result.Error != nil {
+	//     return models.List{}, result.Error
+	// }
+
+	if result := listRepo.DB.Model(&foundList).Update("name", list.Name); result.Error != nil {
+		return models.List{}, result.Error
+	}
+
+	return foundList, nil
+}
+
+func (listRepo *ListRepository) DeleteList(listId uint) (models.List, error) {
+	var deletedList models.List
+	if result := listRepo.DB.Delete(&deletedList, listId); result.RowsAffected == 0 {
+		return models.List{}, errors.New("error trying to deleted")
+	}
+
+	return deletedList, nil
 }

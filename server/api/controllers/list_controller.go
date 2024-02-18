@@ -7,6 +7,7 @@ import (
 	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/dto/responses"
 	"github.com/RomainC75/todo2/api/services"
+	"github.com/RomainC75/todo2/utils/controller_utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -63,4 +64,47 @@ func (listCtrl *ListCtrl) HandleGetList(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"list": responses.GetListResponseFromModel(foundList)})
+}
+
+func (listCtrl *ListCtrl) HandleUpdateList(c *gin.Context) {
+	listId, err := controller_utils.GetIdFromParam(c, "listId")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	userId, _ := c.Get("user_id")
+
+	var list requests.UpdateListRequest
+	if err := c.ShouldBind(&list); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	list.Id = uint(listId)
+
+	updatedList, err := listCtrl.listSrv.UpdateList(userId.(uint), list)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"updated_list": responses.GetListResponseFromModel(updatedList)})
+}
+
+func (listCtrl *ListCtrl) HandleDeleteList(c *gin.Context) {
+	listId, err := controller_utils.GetIdFromParam(c, "listId")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	userId, _ := c.Get("user_id")
+	deletedList, err := listCtrl.listSrv.DeleteList(userId.(uint), uint(listId))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusUnauthorized, gin.H{"deleted": responses.GetListResponseFromModel(deletedList)})
+
 }
