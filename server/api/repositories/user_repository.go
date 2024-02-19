@@ -26,6 +26,7 @@ func (userRepo *UserRepository) CreateUser(user models.User) (models.User, error
 		return models.User{}, errors.New("error trying to create a new user :-(")
 	}
 	fmt.Println("affected rows : ", newUser)
+
 	return newUser, nil
 }
 
