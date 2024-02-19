@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/RomainC75/todo2/data/database"
 	"github.com/RomainC75/todo2/data/models"
@@ -22,11 +21,8 @@ func NewUserRepo() *UserRepository {
 func (userRepo *UserRepository) CreateUser(user models.User) (models.User, error) {
 	var newUser models.User
 	if result := userRepo.DB.Create(&user).Scan(&newUser); result.RowsAffected == 0 {
-		fmt.Println("affected rows : ", result.RowsAffected)
 		return models.User{}, errors.New("error trying to create a new user :-(")
 	}
-	fmt.Println("affected rows : ", newUser)
-
 	return newUser, nil
 }
 
