@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"database/sql"
 	"errors"
 	"strings"
 	"time"
@@ -59,11 +60,11 @@ func (listRepo *ListRepository) UpdateList(ctx *gin.Context, listToGet db.GetLis
 	return updatedList, err
 }
 
-// func (listRepo *ListRepository) DeleteList(listId uint) (models.List, error) {
-// 	var deletedList models.List
-// 	// if result := listRepo.DB.Delete(&deletedList, listId); result.RowsAffected == 0 {
-// 	// 	return models.List{}, errors.New("error trying to deleted")
-// 	// }
-
-// 	return deletedList, nil
-// }
+func (listRepo *ListRepository) DeleteList(ctx *gin.Context, listToDelete db.DeleteListParams) (db.List, error) {
+	// TODO : delete items too !!
+	deletedList, err := (*listRepo.Store).DeleteList(ctx, listToDelete)
+	if err == sql.ErrNoRows {
+		err = errors.New("no list found")
+	}
+	return deletedList, err
+}

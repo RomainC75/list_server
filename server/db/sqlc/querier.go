@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	CreateList(ctx context.Context, arg CreateListParams) (List, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteList(ctx context.Context, arg DeleteListParams) (List, error)
 	GetListForUpdate(ctx context.Context, arg GetListForUpdateParams) (List, error)
 	GetUser(ctx context.Context, id int32) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)

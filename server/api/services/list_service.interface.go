@@ -11,4 +11,5 @@ type ListSrvInterface interface {
 	GetListsByUserIdSrv(userId uint) []db.List
 	GetListOwnedByUser(userId uint, listId uint) (db.List, error)
 	UpdateList(userId uint, list db.List) (db.List, error)
+	DeleteList(ctx *gin.Context, userId int32, listId int32) (db.List, error)
 }

@@ -25,3 +25,8 @@ UPDATE lists
 SET name = $2, updated_at = $3
 WHERE id = $1
 RETURNING *;
+
+-- name: DeleteList :one
+DELETE FROM lists
+WHERE id = $1 AND user_id = $2
+RETURNING *;

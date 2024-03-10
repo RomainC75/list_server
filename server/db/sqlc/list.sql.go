@@ -46,6 +46,30 @@ func (q *Queries) CreateList(ctx context.Context, arg CreateListParams) (List, e
 	return i, err
 }
 
+const deleteList = `-- name: DeleteList :one
+DELETE FROM lists
+WHERE id = $1 AND user_id = $2
+RETURNING id, name, created_at, updated_at, user_id
+`
+
+type DeleteListParams struct {
+	ID     int32
+	UserID int32
+}
+
+func (q *Queries) DeleteList(ctx context.Context, arg DeleteListParams) (List, error) {
+	row := q.db.QueryRowContext(ctx, deleteList, arg.ID, arg.UserID)
+	var i List
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+	)
+	return i, err
+}
+
 const getListForUpdate = `-- name: GetListForUpdate :one
 SELECT id, name, created_at, updated_at, user_id FROM lists
 WHERE id = $1 AND user_id = $2 LIMIT 1

@@ -74,19 +74,10 @@ func (listSrv *ListSrv) UpdateListNameSrv(ctx *gin.Context, userId int32, listId
 // 	return updatedList, nil
 // }
 
-// func (listSrv *ListSrv) DeleteList(userId uint, listId uint) (models.List, error) {
-// 	foundList, err := listSrv.listRepository.GetListById(listId)
-// 	if err != nil {
-// 		return models.List{}, nil
-// 	}
+func (listSrv *ListSrv) DeleteList(ctx *gin.Context, userId int32, listId int32) (db.List, error) {
+	var listTodelete db.DeleteListParams
+	listTodelete.ID = listId
+	listTodelete.UserID = userId
 
-// 	if foundList.UserRefer != userId {
-// 		return models.List{}, errors.New("not the owner of this list")
-// 	}
-
-// 	deleteList, err := listSrv.listRepository.DeleteList(listId)
-// 	if err != nil {
-// 		return models.List{}, err
-// 	}
-// 	return deleteList, nil
-// }
+	return listSrv.listRepo.DeleteList(ctx, listTodelete)
+}

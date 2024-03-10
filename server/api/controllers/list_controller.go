@@ -94,19 +94,19 @@ func (listCtrl *ListCtrl) HandleUpdateList(c *gin.Context) {
 }
 
 func (listCtrl *ListCtrl) HandleDeleteList(c *gin.Context) {
-	// listId, err := controller_utils.GetIdFromParam(c, "listId")
-	// if err != nil {
-	// 	c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	listId, err := controller_utils.GetIdFromParam(c, "listId")
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
 
-	// userId, _ := c.Get("user_id")
-	// deletedList, err := listCtrl.listSrv.DeleteList(userId.(uint), uint(listId))
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	userId, _ := c.Get("user_id")
+	deletedList, err := listCtrl.listSrv.DeleteList(c, userId.(int32), listId)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
 
-	// c.JSON(http.StatusUnauthorized, gin.H{"deleted": responses.GetListResponseFromModel(deletedList)})
+	c.JSON(http.StatusUnauthorized, gin.H{"deleted_list": responses.GetListResponseFromModel(deletedList)})
 
 }
