@@ -10,7 +10,7 @@ type ListResponse struct {
 	Id        int32      `json:"id"`
 	CreatedAt *time.Time `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
-	Name      string
+	Name      string     `json:"name"`
 }
 
 func GetListResponseFromModel(list db.List) ListResponse {

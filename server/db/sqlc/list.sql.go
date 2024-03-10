@@ -46,6 +46,30 @@ func (q *Queries) CreateList(ctx context.Context, arg CreateListParams) (List, e
 	return i, err
 }
 
+const getListForUpdate = `-- name: GetListForUpdate :one
+SELECT id, name, created_at, updated_at, user_id FROM lists
+WHERE id = $1 AND user_id = $2 LIMIT 1
+FOR NO KEY UPDATE
+`
+
+type GetListForUpdateParams struct {
+	ID     int32
+	UserID int32
+}
+
+func (q *Queries) GetListForUpdate(ctx context.Context, arg GetListForUpdateParams) (List, error) {
+	row := q.db.QueryRowContext(ctx, getListForUpdate, arg.ID, arg.UserID)
+	var i List
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+	)
+	return i, err
+}
+
 const getlist = `-- name: Getlist :one
 SELECT id, name, created_at, updated_at, user_id FROM lists WHERE id = $1
 `
@@ -94,4 +118,32 @@ func (q *Queries) Getlists(ctx context.Context, userID int32) ([]List, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateList = `-- name: UpdateList :one
+
+UPDATE lists 
+SET name = $2, updated_at = $3
+WHERE id = $1
+RETURNING id, name, created_at, updated_at, user_id
+`
+
+type UpdateListParams struct {
+	ID        int32
+	Name      string
+	UpdatedAt time.Time
+}
+
+// NO KEY : avoid dead-lock !
+func (q *Queries) UpdateList(ctx context.Context, arg UpdateListParams) (List, error) {
+	row := q.db.QueryRowContext(ctx, updateList, arg.ID, arg.Name, arg.UpdatedAt)
+	var i List
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserID,
+	)
+	return i, err
 }

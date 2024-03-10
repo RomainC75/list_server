@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	CreateList(ctx context.Context, arg CreateListParams) (List, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	GetListForUpdate(ctx context.Context, arg GetListForUpdateParams) (List, error)
 	GetUser(ctx context.Context, id int32) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	Getitem(ctx context.Context, id int32) (Item, error)
@@ -18,6 +19,8 @@ type Querier interface {
 	Getlists(ctx context.Context, userID int32) ([]List, error)
 	ListItems(ctx context.Context) ([]Item, error)
 	Listusers(ctx context.Context) ([]User, error)
+	// NO KEY : avoid dead-lock !
+	UpdateList(ctx context.Context, arg UpdateListParams) (List, error)
 }
 
 var _ Querier = (*Queries)(nil)

@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"errors"
+	"strings"
 	"time"
 
 	db "github.com/RomainC75/todo2/db/sqlc"
@@ -41,26 +43,21 @@ func (listRepo *ListRepository) GetLists(ctx *gin.Context, userId int32) ([]db.L
 // 	return foundList, nil
 // }
 
-// func (listRepo *ListRepository) UpdateList(userId uint, list requests.UpdateListRequest) (models.List, error) {
-// 	var foundList models.List
-// 	// if result := listRepo.DB.Where("id = ?", list.Id).First(&foundList); result.RowsAffected == 0 {
-// 	// 	return models.List{}, errors.New("not found")
-// 	// }
-// 	if foundList.UserRefer != userId {
-// 		return models.List{}, errors.New("not authorized")
-// 	}
+func (listRepo *ListRepository) UpdateList(ctx *gin.Context, listToGet db.GetListForUpdateParams, listToUpdate db.UpdateListParams) (db.List, error) {
+	_, err := (*listRepo.Store).GetListForUpdate(ctx, listToGet)
+	if err != nil {
+		return db.List{}, err
+	}
 
-// 	// result := listRepo.DB.Save(&foundList)
-// 	// if result.Error != nil {
-// 	//     return models.List{}, result.Error
-// 	// }
+	listToUpdate.UpdatedAt = time.Now()
+	updatedList, err := (*listRepo.Store).UpdateList(ctx, listToUpdate)
 
-// 	// if result := listRepo.DB.Model(&foundList).Update("name", list.Name); result.Error != nil {
-// 	// 	return models.List{}, result.Error
-// 	// }
+	if err != nil && strings.Index(err.Error(), "duplicate key value violates unique constraint") > 1 {
+		err = errors.New("list name already used")
+	}
 
-// 	return foundList, nil
-// }
+	return updatedList, err
+}
 
 // func (listRepo *ListRepository) DeleteList(listId uint) (models.List, error) {
 // 	var deletedList models.List

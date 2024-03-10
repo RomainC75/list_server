@@ -41,6 +41,18 @@ func (listSrv *ListSrv) GetListsByUserIdSrv(ctx *gin.Context, userId int32) ([]d
 	return listSrv.listRepo.GetLists(ctx, userId)
 }
 
+func (listSrv *ListSrv) UpdateListNameSrv(ctx *gin.Context, userId int32, listId int32, list requests.UpdateListReq) (db.List, error) {
+	var listToGet db.GetListForUpdateParams
+	listToGet.ID = listId
+	listToGet.UserID = userId
+
+	var listToUpdate db.UpdateListParams
+	listToUpdate.ID = listId
+	listToUpdate.Name = list.Name
+
+	return listSrv.listRepo.UpdateList(ctx, listToGet, listToUpdate)
+}
+
 // func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {
 // 	foundList, err := listSrv.listRepository.GetListById(listId)
 // 	if err != nil {

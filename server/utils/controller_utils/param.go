@@ -7,11 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetIdFromParam(c *gin.Context, paramName string) (int, error) {
+func GetIdFromParam(c *gin.Context, paramName string) (int32, error) {
 	id := c.Param(paramName)
-	intId, err := strconv.Atoi(id)
+	intId, err := strconv.ParseInt(id, 10, 32)
 	if err != nil {
 		return 0, errors.New("id not valid")
 	}
-	return intId, nil
+	return int32(intId), nil
 }
