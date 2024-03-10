@@ -1,6 +1,8 @@
 package repositories
 
 import (
+	"time"
+
 	db "github.com/RomainC75/todo2/db/sqlc"
 	"github.com/gin-gonic/gin"
 )
@@ -15,8 +17,10 @@ func NewListRepo() *ListRepository {
 	}
 }
 
-func (listRepo *ListRepository) CreateList(ctx *gin.Context, list db.CreateListParams) (db.List, error) {
-	newList, err := (*listRepo.Store).CreateList(ctx, list)
+func (listRepo *ListRepository) CreateList(ctx *gin.Context, arg db.CreateListParams) (db.List, error) {
+	arg.CreatedAt = time.Now()
+	arg.UpdatedAt = arg.CreatedAt
+	newList, err := (*listRepo.Store).CreateList(ctx, arg)
 	if err != nil {
 		return db.List{}, err
 	}

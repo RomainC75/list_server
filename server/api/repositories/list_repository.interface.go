@@ -6,9 +6,9 @@ import (
 )
 
 type ListRepositoryInterface interface {
-	CreateList(ctx *gin.Context, list db.CreateListParams) (db.List, error)
-	GetLists(userId uint) []db.List
-	GetListById(listId uint) (db.List, error)
+	CreateList(ctx *gin.Context, arg db.CreateListParams) (db.List, error)
+	// GetLists(userId uint) []db.List
+	// GetListById(listId uint) (db.List, error)
 	// UpdateList(userId uint, list requests.UpdateListRequest) (db.List, error)
-	DeleteList(listId uint) (db.List, error)
+	// DeleteList(listId uint) (db.List, error)
 }

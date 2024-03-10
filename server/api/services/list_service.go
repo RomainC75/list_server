@@ -1,6 +1,8 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/repositories"
 	db "github.com/RomainC75/todo2/db/sqlc"
@@ -8,12 +10,12 @@ import (
 )
 
 type ListSrv struct {
-	listRepository repositories.ListRepositoryInterface
+	listRepo repositories.ListRepositoryInterface
 }
 
 func NewListSrv() *ListSrv {
 	return &ListSrv{
-		// listRepository: repositories.NewListRepo(),
+		listRepo: repositories.NewListRepo(),
 	}
 }
 
@@ -22,8 +24,8 @@ func (listSrv *ListSrv) CreateListSrv(ctx *gin.Context, userId int32, list reque
 
 	newList.Name = list.Name
 	newList.UserID = userId
-
-	createdList, err := listSrv.listRepository.CreateList(ctx, newList)
+	fmt.Println("pre repo : ", newList)
+	createdList, err := listSrv.listRepo.CreateList(ctx, newList)
 	if err != nil {
 		return db.List{}, err
 	}
