@@ -1,8 +1,8 @@
 -- name: Getlist :one
 SELECT * FROM lists WHERE id = $1;
 
--- name: Listlists :many
-SELECT * FROM lists ORDER BY name;
+-- name: Getlists :many
+SELECT * FROM lists WHERE user_id = $1 ORDER BY updated_at;
 
 -- name: CreateList :one
 INSERT INTO lists (

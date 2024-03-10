@@ -15,8 +15,8 @@ type Querier interface {
 	GetUserByEmail(ctx context.Context, email string) (User, error)
 	Getitem(ctx context.Context, id int32) (Item, error)
 	Getlist(ctx context.Context, id int32) (List, error)
+	Getlists(ctx context.Context, userID int32) ([]List, error)
 	ListItems(ctx context.Context) ([]Item, error)
-	Listlists(ctx context.Context) ([]List, error)
 	Listusers(ctx context.Context) ([]User, error)
 }
 

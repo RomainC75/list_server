@@ -20,11 +20,16 @@ func NewListSrv() *ListSrv {
 }
 
 func (listSrv *ListSrv) CreateListSrv(ctx *gin.Context, userId int32, list requests.CreateListReq) (db.List, error) {
+	foundLists, _ := listSrv.listRepo.GetLists(ctx, userId)
+	for _, foundList := range foundLists {
+		if foundList.Name == list.Name {
+			return db.List{}, fmt.Errorf("duplicate name : %s", list.Name)
+		}
+	}
 	var newList db.CreateListParams
 
 	newList.Name = list.Name
 	newList.UserID = userId
-	fmt.Println("pre repo : ", newList)
 	createdList, err := listSrv.listRepo.CreateList(ctx, newList)
 	if err != nil {
 		return db.List{}, err
@@ -32,9 +37,9 @@ func (listSrv *ListSrv) CreateListSrv(ctx *gin.Context, userId int32, list reque
 	return createdList, nil
 }
 
-// func (listSrv *ListSrv) GetListsByUserIdSrv(userId uint) []models.List {
-// 	return listSrv.listRepository.GetLists(userId)
-// }
+func (listSrv *ListSrv) GetListsByUserIdSrv(ctx *gin.Context, userId int32) ([]db.List, error) {
+	return listSrv.listRepo.GetLists(ctx, userId)
+}
 
 // func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {
 // 	foundList, err := listSrv.listRepository.GetListById(listId)

@@ -27,11 +27,10 @@ func (listRepo *ListRepository) CreateList(ctx *gin.Context, arg db.CreateListPa
 	return newList, nil
 }
 
-// func (listRepo *ListRepository) GetLists(userId uint) []models.List {
-// 	var foundLists []models.List
-// 	// listRepo.DB.Where("user_refer = ?", userId).Find(&foundLists)
-// 	return foundLists
-// }
+func (listRepo *ListRepository) GetLists(ctx *gin.Context, userId int32) ([]db.List, error) {
+	foundLists, err := (*listRepo.Store).Getlists(ctx, userId)
+	return foundLists, err
+}
 
 // func (listRepo *ListRepository) GetListById(listId uint) (models.List, error) {
 // 	var foundList models.List

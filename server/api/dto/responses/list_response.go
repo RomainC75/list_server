@@ -7,7 +7,7 @@ import (
 )
 
 type ListResponse struct {
-	Id        uint       `json:"id"`
+	Id        int32      `json:"id"`
 	CreatedAt *time.Time `json:"createdAt"`
 	UpdatedAt *time.Time `json:"updatedAt"`
 	Name      string
@@ -15,10 +15,10 @@ type ListResponse struct {
 
 func GetListResponseFromModel(list db.List) ListResponse {
 	return ListResponse{
-		// Id:        list.ID,
-		// CreatedAt: &list.CreatedAt,
-		// UpdatedAt: &list.UpdatedAt,
-		// Name:      list.Name,
+		Id:        list.ID,
+		CreatedAt: &list.CreatedAt,
+		UpdatedAt: &list.UpdatedAt,
+		Name:      list.Name,
 	}
 }
 

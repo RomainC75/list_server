@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/RomainC75/todo2/api/dto/requests"
+	"github.com/RomainC75/todo2/api/dto/responses"
 	"github.com/RomainC75/todo2/api/services"
 	"github.com/gin-gonic/gin"
 )
@@ -29,20 +30,25 @@ func (listCtrl *ListCtrl) HandleCreateList(c *gin.Context) {
 	userId, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
+		return
 	}
 	createdList, err := listCtrl.listSrv.CreateListSrv(c, userId.(int32), newList)
-
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"created": createdList})
 }
 
 func (listCtrl *ListCtrl) HandleGetListsFromUser(c *gin.Context) {
-	// userId, _ := c.Get("user_id")
+	userId, _ := c.Get("user_id")
 
-	// foundLists := listCtrl.listSrv.GetListsByUserIdSrv(userId.(uint))
-	// c.JSON(http.StatusAccepted, gin.H{"lists": responses.GetListResponseFromModelList(foundLists)})
+	foundLists, err := listCtrl.listSrv.GetListsByUserIdSrv(c, userId.(int32))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"lists": responses.GetListResponseFromModelList(foundLists)})
 }
 
 func (listCtrl *ListCtrl) HandleGetList(c *gin.Context) {

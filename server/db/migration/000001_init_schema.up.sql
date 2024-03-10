@@ -12,7 +12,8 @@ CREATE TABLE lists (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     user_id INT NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE (name, user_id)
 );
 
 CREATE TABLE items (
