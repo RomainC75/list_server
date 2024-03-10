@@ -1,43 +1,60 @@
 package services
 
 import (
+	"database/sql"
+	"fmt"
+
+	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/repositories"
 	db "github.com/RomainC75/todo2/db/sqlc"
+	"github.com/RomainC75/todo2/utils"
+	"github.com/gin-gonic/gin"
 )
 
 type ItemSrv struct {
-	itemRepository repositories.ItemRepositoryInterface
-	listRepository repositories.ListRepositoryInterface
+	itemRepo repositories.ItemRepositoryInterface
+	listRepo repositories.ListRepositoryInterface
 }
 
 func NewItemSrv() *ItemSrv {
 	return &ItemSrv{
-		// itemRepository: repositories.NewItemRepo(),
+		itemRepo: repositories.NewItemRepo(),
+		listRepo: repositories.NewListRepo(),
 	}
 }
 
-func (itemSrv *ItemSrv) CreateItemSrv(userId uint, listId uint, item db.Item) (db.Item, error) {
-	// foundList, err := itemSrv.listRepository.GetListById(listId)
-	// if err != nil {
-	// 	return db.Item{}, err
-	// }
+func (itemSrv *ItemSrv) CreateItemSrv(ctx *gin.Context, userId int32, listId int32, item requests.CreateItemRequest) (db.Item, error) {
 
-	// if foundList.UserRefer != userId {
-	// 	return db.Item{}, errors.New("unauthorized to create  an item to this list")
-	// }
+	foundList, err := itemSrv.listRepo.GetListByIdByOwner(ctx, db.GetlistParams{
+		ID:     listId,
+		UserID: userId,
+	})
+	if err != nil {
+		return db.Item{}, err
+	}
+	fmt.Println("foundList : ", foundList)
+	utils.PrettyDisplay("new item to create : ", item)
 
-	// itemToCreate := db.Item{
-	// 	Name:        item.Name,
-	// 	Description: item.Description,
-	// 	Date:        *item.Date,
-	// }
+	itemToCreate := db.CreateItemParams{
+		Name: item.Name,
+		Description: sql.NullString{
+			String: item.Description,
+			Valid:  true,
+		},
+	}
+	if !item.Date.IsZero() {
+		itemToCreate.Date = sql.NullTime{
+			Time:  item.Date,
+			Valid: true,
+		}
+	}
 
-	// createdItem, err := itemSrv.itemRepository.CreateItem(itemToCreate, foundList)
-	// if err != nil {
-	// 	return db.Item{}, err
-	// }
+	createdItem, err := itemSrv.itemRepo.CreateItem(ctx, itemToCreate, listId)
+	if err != nil {
+		return db.Item{}, err
+	}
 
-	return db.Item{}, nil
+	return createdItem, nil
 }
 
 // func (listSrv *ListSrv) GetListsByUserIdSrv(userId uint) []db.List {

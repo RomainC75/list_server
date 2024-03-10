@@ -2,8 +2,9 @@ package repositories
 
 import (
 	db "github.com/RomainC75/todo2/db/sqlc"
+	"github.com/gin-gonic/gin"
 )
 
 type ItemRepositoryInterface interface {
-	CreateItem(item db.Item, preloadedList db.List) (db.Item, error)
+	CreateItem(ctx *gin.Context, itemToCreate db.CreateItemParams, listId int32) (db.Item, error)
 }

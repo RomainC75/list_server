@@ -95,11 +95,17 @@ func (q *Queries) GetListForUpdate(ctx context.Context, arg GetListForUpdatePara
 }
 
 const getlist = `-- name: Getlist :one
-SELECT id, name, created_at, updated_at, user_id FROM lists WHERE id = $1
+SELECT id, name, created_at, updated_at, user_id FROM lists
+WHERE id = $1 AND user_id = $2 LIMIT 1
 `
 
-func (q *Queries) Getlist(ctx context.Context, id int32) (List, error) {
-	row := q.db.QueryRowContext(ctx, getlist, id)
+type GetlistParams struct {
+	ID     int32
+	UserID int32
+}
+
+func (q *Queries) Getlist(ctx context.Context, arg GetlistParams) (List, error) {
+	row := q.db.QueryRowContext(ctx, getlist, arg.ID, arg.UserID)
 	var i List
 	err := row.Scan(
 		&i.ID,

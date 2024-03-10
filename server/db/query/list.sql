@@ -1,5 +1,6 @@
 -- name: Getlist :one
-SELECT * FROM lists WHERE id = $1;
+SELECT * FROM lists
+WHERE id = $1 AND user_id = $2 LIMIT 1;
 
 -- name: Getlists :many
 SELECT * FROM lists WHERE user_id = $1 ORDER BY updated_at;

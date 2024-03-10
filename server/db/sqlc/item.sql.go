@@ -7,7 +7,49 @@ package db
 
 import (
 	"context"
+	"database/sql"
+	"time"
 )
+
+const createItem = `-- name: CreateItem :one
+INSERT INTO items (
+    name,
+    description,
+    date,
+    created_at,
+    updated_at
+) VALUES (
+    $1, $2, $3, $4, $5
+) RETURNING id, name, description, date, created_at, updated_at
+`
+
+type CreateItemParams struct {
+	Name        string
+	Description sql.NullString
+	Date        sql.NullTime
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
+	row := q.db.QueryRowContext(ctx, createItem,
+		arg.Name,
+		arg.Description,
+		arg.Date,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Date,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
 
 const getitem = `-- name: Getitem :one
 SELECT id, name, description, date, created_at, updated_at FROM items WHERE id = $1
@@ -24,6 +66,27 @@ func (q *Queries) Getitem(ctx context.Context, id int32) (Item, error) {
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)
+	return i, err
+}
+
+const linkItemToList = `-- name: LinkItemToList :one
+INSERT INTO list_item (
+    list_id,
+    item_id
+)VALUES (
+    $1, $2
+) RETURNING id, list_id, item_id
+`
+
+type LinkItemToListParams struct {
+	ListID int32
+	ItemID int32
+}
+
+func (q *Queries) LinkItemToList(ctx context.Context, arg LinkItemToListParams) (ListItem, error) {
+	row := q.db.QueryRowContext(ctx, linkItemToList, arg.ListID, arg.ItemID)
+	var i ListItem
+	err := row.Scan(&i.ID, &i.ListID, &i.ItemID)
 	return i, err
 }
 

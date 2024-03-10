@@ -3,6 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -35,14 +36,14 @@ func (listRepo *ListRepository) GetLists(ctx *gin.Context, userId int32) ([]db.L
 	return foundLists, err
 }
 
-// func (listRepo *ListRepository) GetListById(listId uint) (models.List, error) {
-// 	var foundList models.List
-// 	fmt.Println("listID : ", listId)
-// 	// if result := listRepo.DB.Where("id = ? ", listId).First(&foundList); result.RowsAffected == 0 {
-// 	// 	return models.List{}, errors.New("not found")
-// 	// }
-// 	return foundList, nil
-// }
+func (listRepo *ListRepository) GetListByIdByOwner(ctx *gin.Context, getListParams db.GetlistParams) (db.List, error) {
+	foundList, err := (*listRepo.Store).Getlist(ctx, getListParams)
+	if err == sql.ErrNoRows {
+		fmt.Println("list not found : ", err.Error())
+		return db.List{}, errors.New("no list found")
+	}
+	return foundList, err
+}
 
 func (listRepo *ListRepository) UpdateList(ctx *gin.Context, listToGet db.GetListForUpdateParams, listToUpdate db.UpdateListParams) (db.List, error) {
 	_, err := (*listRepo.Store).GetListForUpdate(ctx, listToGet)

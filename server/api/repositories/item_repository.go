@@ -1,32 +1,42 @@
 package repositories
 
 import (
+	"fmt"
+	"time"
+
 	db "github.com/RomainC75/todo2/db/sqlc"
+	"github.com/gin-gonic/gin"
 )
 
 type ItemRepository struct {
-	DB *db.Store
+	Store *db.Store
 }
 
 func NewItemRepo() *ItemRepository {
 	return &ItemRepository{
-		DB: db.GetConnection(),
+		Store: db.GetConnection(),
 	}
 }
 
-// func (itemRepo *ItemRepository) CreateItem(item models.Item, preloadedList models.List) (models.Item, error) {
+func (itemRepo *ItemRepository) CreateItem(ctx *gin.Context, itemToCreate db.CreateItemParams, listId int32) (db.Item, error) {
+	itemToCreate.CreatedAt = time.Now()
+	itemToCreate.UpdatedAt = itemToCreate.CreatedAt
+	createdItem, err := (*itemRepo.Store).CreateItem(ctx, itemToCreate)
+	fmt.Println("==> createdItem : ", createdItem, err)
+	if err != nil {
+		return db.Item{}, err
+	}
 
-// 	// itemRepo.DB.Preload("Item").First(&preloadedList, 1)
-// 	// preloadedList.Items = append(preloadedList.Items, &item)
-
-// 	// if result := itemRepo.DB.Save(&preloadedList); result.RowsAffected == 0 {
-// 	// 	return models.Item{}, errors.New("ekrror trying to create")
-// 	// }
-
-// 	// var newItem models.Item
-// 	// if result := itemRepo.DB.Create(&item).Scan(&newItem); result.RowsAffected == 0 {
-// 	// 	return models.Item{}, errors.New("error trying to create a new user :-(")
-// 	// }
-
-// 	return item, nil
-// }
+	var linkItemToListParam db.LinkItemToListParams
+	linkItemToListParam.ItemID = createdItem.ID
+	linkItemToListParam.ListID = listId
+	_, err = (*itemRepo.Store).LinkItemToList(ctx, linkItemToListParam)
+	if err != nil {
+		fmt.Println("=> is error creating new item ? ", err.Error())
+	}
+	// if err != nil {
+	// TODO: DELETE ITEM ?
+	// TODO : transactions Tx??
+	// }
+	return createdItem, nil
+}
