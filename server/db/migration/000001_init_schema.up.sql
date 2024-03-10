@@ -1,17 +1,17 @@
 CREATE TABLE users (
     id   SERIAL PRIMARY KEY,
     email TEXT UNIQUE NOT NULL,
-    password  TEXT NOT NULL
-    -- created_at DATE,
-    -- updated_at DATE
+    password  TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE lists (
     id   SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
-    -- created_at DATE,
-    -- updated_at DATE,
-    user_id INT,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL,
+    user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
@@ -19,10 +19,17 @@ CREATE TABLE items (
     id   SERIAL PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
-    date DATE,
-    -- created_at DATE,
-    -- updated_at DATE,
-    user_id INT,
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    date TIMESTAMP,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
+
+CREATE TABLE list_item (
+    id SERIAL PRIMARY KEY,
+    list_id INT NOT NULL,
+    item_id INT NOT NULL,
+    FOREIGN KEY (list_id) REFERENCES lists(id),
+    FOREIGN KEY (item_id) REFERENCES items(id)
 );
 

@@ -1,6 +1,9 @@
 package repositories
 
 import (
+	"fmt"
+	"time"
+
 	db "github.com/RomainC75/todo2/db/sqlc"
 	"github.com/gin-gonic/gin"
 )
@@ -18,6 +21,9 @@ func NewUserRepo() *UserRepository {
 // sql.ErrNoRows
 
 func (userRepo *UserRepository) CreateUser(ctx *gin.Context, arg db.CreateUserParams) (db.User, error) {
+	arg.CreatedAt = time.Now()
+	arg.UpdatedAt = arg.CreatedAt
+	fmt.Println("=> pre insert db", arg)
 	user, err := (*userRepo.Store).CreateUser(ctx, arg)
 	if err != nil {
 		return db.User{}, err

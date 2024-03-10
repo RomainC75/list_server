@@ -9,7 +9,7 @@ import (
 func ListRoutes(router *gin.Engine) {
 	listController := controllers.NewListCtrl()
 
-	listGroup := router.Group("/list")
+	listGroup := router.Group("/lists")
 	{
 		listGroup.POST("/", middlewares.IsAuth(false), listController.HandleCreateList)
 		listGroup.GET("/", middlewares.IsAuth(false), listController.HandleGetListsFromUser)

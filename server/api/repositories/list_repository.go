@@ -2,25 +2,26 @@ package repositories
 
 import (
 	db "github.com/RomainC75/todo2/db/sqlc"
+	"github.com/gin-gonic/gin"
 )
 
 type ListRepository struct {
-	DB *db.Store
+	Store *db.Store
 }
 
 func NewListRepo() *ListRepository {
 	return &ListRepository{
-		DB: db.GetConnection(),
+		Store: db.GetConnection(),
 	}
 }
 
-// func (listRepo *ListRepository) CreateList(list models.List) (models.List, error) {
-// 	var newList models.List
-// 	// if result := listRepo.DB.Create(&list).Scan(&newList); result.RowsAffected == 0 {
-// 	// 	return models.List{}, errors.New("error trying to create a new user :-(")
-// 	// }
-// 	return newList, nil
-// }
+func (listRepo *ListRepository) CreateList(ctx *gin.Context, list db.CreateListParams) (db.List, error) {
+	newList, err := (*listRepo.Store).CreateList(ctx, list)
+	if err != nil {
+		return db.List{}, err
+	}
+	return newList, nil
+}
 
 // func (listRepo *ListRepository) GetLists(userId uint) []models.List {
 // 	var foundLists []models.List

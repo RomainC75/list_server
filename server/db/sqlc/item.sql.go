@@ -10,7 +10,7 @@ import (
 )
 
 const getitem = `-- name: Getitem :one
-SELECT id, name, description, date, user_id FROM items WHERE id = $1
+SELECT id, name, description, date, created_at, updated_at FROM items WHERE id = $1
 `
 
 func (q *Queries) Getitem(ctx context.Context, id int32) (Item, error) {
@@ -21,13 +21,14 @@ func (q *Queries) Getitem(ctx context.Context, id int32) (Item, error) {
 		&i.Name,
 		&i.Description,
 		&i.Date,
-		&i.UserID,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }
 
 const listItems = `-- name: ListItems :many
-SELECT id, name, description, date, user_id FROM items ORDER BY name
+SELECT id, name, description, date, created_at, updated_at FROM items ORDER BY name
 `
 
 func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
@@ -44,7 +45,8 @@ func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
 			&i.Name,
 			&i.Description,
 			&i.Date,
-			&i.UserID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
 		); err != nil {
 			return nil, err
 		}

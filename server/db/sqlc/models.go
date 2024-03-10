@@ -6,6 +6,7 @@ package db
 
 import (
 	"database/sql"
+	"time"
 )
 
 type Item struct {
@@ -13,17 +14,28 @@ type Item struct {
 	Name        string
 	Description sql.NullString
 	Date        sql.NullTime
-	UserID      sql.NullInt32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 type List struct {
+	ID        int32
+	Name      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	UserID    int32
+}
+
+type ListItem struct {
 	ID     int32
-	Name   string
-	UserID sql.NullInt32
+	ListID int32
+	ItemID int32
 }
 
 type User struct {
-	ID       int32
-	Email    string
-	Password string
+	ID        int32
+	Email     string
+	Password  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
