@@ -1,13 +1,12 @@
 package services
 
 import (
-	"github.com/RomainC75/todo2/api/dto/requests"
-	"github.com/RomainC75/todo2/data/models"
+	db "github.com/RomainC75/todo2/db/sqlc"
 )
 
 type ListSrvInterface interface {
-	CreateListSrv(userId uint, list requests.CreateListRequest) (models.List, error)
-	GetListsByUserIdSrv(userId uint) []models.List
-	GetListOwnedByUser(userId uint, listId uint) (models.List, error)
-	UpdateList(userId uint, list requests.UpdateListRequest) (models.List, error)
+	CreateListSrv(userId uint, list db.List) (db.List, error)
+	GetListsByUserIdSrv(userId uint) []db.List
+	GetListOwnedByUser(userId uint, listId uint) (db.List, error)
+	UpdateList(userId uint, list db.List) (db.List, error)
 }

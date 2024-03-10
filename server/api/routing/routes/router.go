@@ -11,7 +11,7 @@ import (
 func RegisterRoutes(router *gin.Engine) {
 	router.Use(middlewares.CORSMiddleware())
 	AuthRoutes(router)
-	ListRoutes(router)
+	// ListRoutes(router)
 
 	router.GET("/hello", func(c *gin.Context) {
 		fmt.Println("received")

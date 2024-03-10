@@ -13,23 +13,17 @@ type Item struct {
 	Name        string
 	Description sql.NullString
 	Date        sql.NullTime
-	CreatedAt   sql.NullTime
-	UpdatedAt   sql.NullTime
 	UserID      sql.NullInt32
 }
 
 type List struct {
-	ID        int32
-	Name      string
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
-	UserID    sql.NullInt32
+	ID     int32
+	Name   string
+	UserID sql.NullInt32
 }
 
 type User struct {
-	ID        int32
-	Email     string
-	Password  sql.NullString
-	CreatedAt sql.NullTime
-	UpdatedAt sql.NullTime
+	ID       int32
+	Email    string
+	Password string
 }

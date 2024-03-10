@@ -1,8 +1,11 @@
 package repositories
 
-import "github.com/RomainC75/todo2/data/models"
+import (
+	db "github.com/RomainC75/todo2/db/sqlc"
+	"github.com/gin-gonic/gin"
+)
 
 type UserRepositoryInterface interface {
-	CreateUser(user models.User) (models.User, error)
-	FindUserByEmail(email string) (models.User, error)
+	CreateUser(ctx *gin.Context, arg db.CreateUserParams) (db.User, error)
+	FindUserByEmail(email string) (db.User, error)
 }

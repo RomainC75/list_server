@@ -1,14 +1,13 @@
 package repositories
 
 import (
-	"github.com/RomainC75/todo2/api/dto/requests"
-	"github.com/RomainC75/todo2/data/models"
+	db "github.com/RomainC75/todo2/db/sqlc"
 )
 
 type ListRepositoryInterface interface {
-	CreateList(list models.List) (models.List, error)
-	GetLists(userId uint) []models.List
-	GetListById(listId uint) (models.List, error)
-	UpdateList(userId uint, list requests.UpdateListRequest) (models.List, error)
-	DeleteList(listId uint) (models.List, error)
+	CreateList(list db.List) (db.List, error)
+	GetLists(userId uint) []db.List
+	GetListById(listId uint) (db.List, error)
+	// UpdateList(userId uint, list requests.UpdateListRequest) (db.List, error)
+	DeleteList(listId uint) (db.List, error)
 }

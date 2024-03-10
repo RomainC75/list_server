@@ -1,7 +1,9 @@
 package repositories
 
-import "github.com/RomainC75/todo2/data/models"
+import (
+	db "github.com/RomainC75/todo2/db/sqlc"
+)
 
 type ItemRepositoryInterface interface {
-	CreateItem(item models.Item, preloadedList models.List) (models.Item, error)
+	CreateItem(item db.Item, preloadedList db.List) (db.Item, error)
 }

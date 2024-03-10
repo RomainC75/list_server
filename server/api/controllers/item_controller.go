@@ -1,21 +1,18 @@
 package controllers
 
 import (
-	"net/http"
-
-	"github.com/RomainC75/todo2/api/services"
 	"github.com/gin-gonic/gin"
 )
 
 type ItemCtrl struct {
-	listSrv services.ListSrv
-	itemSrv services.ItemSrv
+	// listSrv services.ListSrv
+	// itemSrv services.ItemSrv
 }
 
 func NewItemCtrl() *ItemCtrl {
 	return &ItemCtrl{
-		listSrv: *services.NewListSrv(),
-		itemSrv: *services.NewItemSrv(),
+		// listSrv: *services.NewListSrv(),
+		// itemSrv: *services.NewItemSrv(),
 	}
 }
 
@@ -27,16 +24,16 @@ func (itemCtrl *ItemCtrl) HandleCreateItem(c *gin.Context) {
 	// 	return
 	// }
 
-	userId, exists := c.Get("user_id")
+	// userId, exists := c.Get("user_id")
 
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
-	}
+	// if !exists {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
+	// }
 
-	foundList, err := itemCtrl.itemSrv.CreateItemSrv()
+	// foundList, err := itemCtrl.itemSrv.CreateItemSrv()
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-	}
-	c.JSON(http.StatusAccepted, gin.H{"created": createdList})
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	// }
+	// c.JSON(http.StatusAccepted, gin.H{"created": createdList})
 }

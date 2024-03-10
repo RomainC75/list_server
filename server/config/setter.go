@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -17,7 +16,6 @@ func Set() {
 	}
 
 	err := viper.Unmarshal(&configurations)
-	fmt.Print("BEFOS : ", configurations)
 	if err != nil {
 		log.Fatal("unable to decode into struct")
 	}

@@ -10,24 +10,18 @@ import (
 )
 
 const getlist = `-- name: Getlist :one
-SELECT id, name, created_at, updated_at, user_id FROM lists WHERE id = $1
+SELECT id, name, user_id FROM lists WHERE id = $1
 `
 
 func (q *Queries) Getlist(ctx context.Context, id int32) (List, error) {
 	row := q.db.QueryRowContext(ctx, getlist, id)
 	var i List
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.UserID,
-	)
+	err := row.Scan(&i.ID, &i.Name, &i.UserID)
 	return i, err
 }
 
 const listlists = `-- name: Listlists :many
-SELECT id, name, created_at, updated_at, user_id FROM lists ORDER BY name
+SELECT id, name, user_id FROM lists ORDER BY name
 `
 
 func (q *Queries) Listlists(ctx context.Context) ([]List, error) {
@@ -36,16 +30,10 @@ func (q *Queries) Listlists(ctx context.Context) ([]List, error) {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []List
+	items := []List{}
 	for rows.Next() {
 		var i List
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-			&i.UserID,
-		); err != nil {
+		if err := rows.Scan(&i.ID, &i.Name, &i.UserID); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

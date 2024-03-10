@@ -1,35 +1,32 @@
 package repositories
 
 import (
-	"errors"
-
-	"github.com/RomainC75/todo2/data/database"
-	"github.com/RomainC75/todo2/data/models"
-	"gorm.io/gorm"
+	db "github.com/RomainC75/todo2/db/sqlc"
+	"github.com/gin-gonic/gin"
 )
 
 type UserRepository struct {
-	DB *gorm.DB
+	DB *db.Store
 }
 
 func NewUserRepo() *UserRepository {
 	return &UserRepository{
-		DB: database.GetConnection(),
+		DB: db.GetConnection(),
 	}
 }
 
-func (userRepo *UserRepository) CreateUser(user models.User) (models.User, error) {
-	var newUser models.User
-	if result := userRepo.DB.Create(&user).Scan(&newUser); result.RowsAffected == 0 {
-		return models.User{}, errors.New("error trying to create a new user :-(")
+func (userRepo *UserRepository) CreateUser(ctx *gin.Context, arg db.CreateUserParams) (db.User, error) {
+	user, err := (*userRepo.DB).CreateUser(ctx, arg)
+	if err != nil {
+		return db.User{}, err
 	}
-	return newUser, nil
+	return user, nil
 }
 
-func (userRepo *UserRepository) FindUserByEmail(email string) (models.User, error) {
-	var foundUser models.User
-	if result := userRepo.DB.Where("email = ?", email).First(&foundUser); result.RowsAffected == 0 {
-		return models.User{}, errors.New("no user found")
-	}
+func (userRepo *UserRepository) FindUserByEmail(email string) (db.User, error) {
+	var foundUser db.User
+	// if result := userRepo.DB.Where("email = ?", email).First(&foundUser); result.RowsAffected == 0 {
+	// 	return db.User{}, errors.New("no user found")
+	// }
 	return foundUser, nil
 }
