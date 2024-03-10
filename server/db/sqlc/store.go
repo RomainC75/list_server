@@ -11,10 +11,6 @@ import (
 	"github.com/RomainC75/todo2/config"
 )
 
-func GetConnection() *Store {
-	return DbStore
-}
-
 type Store interface {
 	Querier
 }
@@ -52,4 +48,8 @@ func Connect() {
 	}
 
 	DbStore = &store
+}
+
+func GetConnection() *Store {
+	return DbStore
 }

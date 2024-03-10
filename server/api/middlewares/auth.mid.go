@@ -3,6 +3,7 @@ package middlewares
 import (
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/RomainC75/todo2/utils"
@@ -35,9 +36,9 @@ func IsAuth(isSocket bool) gin.HandlerFunc {
 			return
 		}
 		utils.PrettyDisplay("CLAIMS", claims)
-
+		fmt.Println("type of id :! ", reflect.TypeOf((claims["id"])))
 		c.Set("user_email", claims["email"])
-		c.Set("user_id", uint(claims["id"].(float64)))
+		c.Set("user_id", int32(claims["id"].(float64)))
 		c.Next()
 	}
 }

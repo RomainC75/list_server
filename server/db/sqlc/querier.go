@@ -11,6 +11,7 @@ import (
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetUser(ctx context.Context, id int32) (User, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
 	Getitem(ctx context.Context, id int32) (Item, error)
 	Getlist(ctx context.Context, id int32) (List, error)
 	ListItems(ctx context.Context) ([]Item, error)

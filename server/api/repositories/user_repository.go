@@ -6,27 +6,29 @@ import (
 )
 
 type UserRepository struct {
-	DB *db.Store
+	Store *db.Store
 }
 
 func NewUserRepo() *UserRepository {
 	return &UserRepository{
-		DB: db.GetConnection(),
+		Store: db.GetConnection(),
 	}
 }
 
+// sql.ErrNoRows
+
 func (userRepo *UserRepository) CreateUser(ctx *gin.Context, arg db.CreateUserParams) (db.User, error) {
-	user, err := (*userRepo.DB).CreateUser(ctx, arg)
+	user, err := (*userRepo.Store).CreateUser(ctx, arg)
 	if err != nil {
 		return db.User{}, err
 	}
 	return user, nil
 }
 
-func (userRepo *UserRepository) FindUserByEmail(email string) (db.User, error) {
-	var foundUser db.User
-	// if result := userRepo.DB.Where("email = ?", email).First(&foundUser); result.RowsAffected == 0 {
-	// 	return db.User{}, errors.New("no user found")
-	// }
+func (userRepo *UserRepository) FindUserByEmail(ctx *gin.Context, email string) (db.User, error) {
+	foundUser, err := (*userRepo.Store).GetUserByEmail(ctx, email)
+	if err != nil {
+		return db.User{}, err
+	}
 	return foundUser, nil
 }

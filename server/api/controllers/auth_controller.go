@@ -1,9 +1,12 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
+	"reflect"
 
 	"github.com/RomainC75/todo2/api/dto/requests"
+	"github.com/RomainC75/todo2/api/dto/responses"
 	"github.com/RomainC75/todo2/api/services"
 	"github.com/gin-gonic/gin"
 )
@@ -35,28 +38,29 @@ func (authCtrl *AuthCtrl) HandleSignup(c *gin.Context) {
 }
 
 func (authCtrl *AuthCtrl) HandleLogin(c *gin.Context) {
-	// var loginInfos requests.LoginRequest
-	// if err := c.ShouldBind(&loginInfos); err != nil {
-	// 	c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	var loginInfos requests.LoginRequest
+	if err := c.ShouldBind(&loginInfos); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
 
-	// loginResponse, err := authCtrl.userSrv.LoginUserSrv(loginInfos)
-	// if err != nil {
-	// 	c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-	// 	return
-	// }
+	loginResponse, err := authCtrl.userSrv.LoginUserSrv(c, loginInfos)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
 
-	// c.JSON(http.StatusUnprocessableEntity, gin.H{"authentication_details": loginResponse})
+	c.JSON(http.StatusUnprocessableEntity, gin.H{"authentication_details": loginResponse})
 }
 
 func (AuthCtrl *AuthCtrl) HandleVerify(c *gin.Context) {
-	// id, _ := c.Get("user_id")
-	// email, _ := c.Get("user_email")
-
-	// verifyResponse := responses.AuthVerifyResponse{
-	// 	Id:    id.(float64),
-	// 	Email: email.(string),
-	// }
-	// c.JSON(http.StatusAccepted, gin.H{"infos": verifyResponse})
+	id, _ := c.Get("user_id")
+	email, _ := c.Get("user_email")
+	fmt.Println("===> got : ", id, email)
+	fmt.Print("type of : ", reflect.TypeOf(id))
+	verifyResponse := responses.AuthVerifyResponse{
+		Id:    id.(int32),
+		Email: email.(string),
+	}
+	c.JSON(http.StatusAccepted, gin.H{"infos": verifyResponse})
 }
