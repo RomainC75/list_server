@@ -13,7 +13,7 @@ func ItemRoutes(router *gin.Engine) {
 	{
 		itemGroup.POST("/:listId", middlewares.IsAuth(false), itemController.HandleCreateItem)
 		// itemGroup.GET("/", middlewares.IsAuth(false), itemController.HandleGetListsFromUser)
-		// itemGroup.GET("/:listId", middlewares.IsAuth(false), itemController.HandleGetList)
+		itemGroup.GET("/:listId", middlewares.IsAuth(false), itemController.HandleGetItemsByListId)
 		// itemGroup.PUT("/:listId", middlewares.IsAuth(false), itemController.HandleUpdateList)
 		// itemGroup.DELETE("/:listId", middlewares.IsAuth(false), itemController.HandleDeleteList)
 	}

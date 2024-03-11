@@ -41,3 +41,8 @@ func (itemRepo *ItemRepository) CreateItem(ctx *gin.Context, itemToCreate db.Cre
 	})
 	return createdItem, err
 }
+
+func (itemRepo *ItemRepository) GetItems(ctx *gin.Context, listId int32) ([]db.Item, error) {
+	foundItems, err := (*itemRepo.Store).GetItemsByListName(ctx, listId)
+	return foundItems, err
+}

@@ -47,3 +47,18 @@ func (itemCtrl *ItemCtrl) HandleCreateItem(c *gin.Context) {
 	}
 	c.JSON(http.StatusAccepted, gin.H{"created": createdItem})
 }
+
+func (itemCtrl *ItemCtrl) HandleGetItemsByListId(c *gin.Context) {
+	listId, err := controller_utils.GetIdFromParam(c, "listId")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the list id from the url"})
+		return
+	}
+	itemsFound, err := itemCtrl.itemSrv.GetItemsByListSrv(c, listId)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"found_items": itemsFound})
+}

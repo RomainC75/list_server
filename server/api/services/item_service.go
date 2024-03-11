@@ -57,9 +57,9 @@ func (itemSrv *ItemSrv) CreateItemSrv(ctx *gin.Context, userId int32, listId int
 	return createdItem, nil
 }
 
-// func (listSrv *ListSrv) GetListsByUserIdSrv(userId uint) []db.List {
-// 	return listSrv.listRepository.GetLists(userId)
-// }
+func (itemSrv *ItemSrv) GetItemsByListSrv(ctx *gin.Context, listId int32) ([]db.Item, error) {
+	return itemSrv.itemRepo.GetItems(ctx, listId)
+}
 
 // func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {
 // 	foundList, err := listSrv.listRepository.GetListById(listId)

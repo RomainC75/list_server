@@ -51,6 +51,43 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 	return i, err
 }
 
+const getItemsByListName = `-- name: GetItemsByListName :many
+SELECT items.id, items.name, items.description, items.date, items.created_at, items.updated_at FROM items 
+INNER JOIN list_item ON items.id=list_item.item_id 
+INNER JOIN lists ON list_item.list_id = lists.id
+WHERE lists.id = $1
+`
+
+func (q *Queries) GetItemsByListName(ctx context.Context, id int32) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, getItemsByListName, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Item{}
+	for rows.Next() {
+		var i Item
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Date,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getitem = `-- name: Getitem :one
 SELECT id, name, description, date, created_at, updated_at FROM items WHERE id = $1
 `
@@ -88,38 +125,4 @@ func (q *Queries) LinkItemToList(ctx context.Context, arg LinkItemToListParams) 
 	var i ListItem
 	err := row.Scan(&i.ID, &i.ListID, &i.ItemID)
 	return i, err
-}
-
-const listItems = `-- name: ListItems :many
-SELECT id, name, description, date, created_at, updated_at FROM items ORDER BY name
-`
-
-func (q *Queries) ListItems(ctx context.Context) ([]Item, error) {
-	rows, err := q.db.QueryContext(ctx, listItems)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	items := []Item{}
-	for rows.Next() {
-		var i Item
-		if err := rows.Scan(
-			&i.ID,
-			&i.Name,
-			&i.Description,
-			&i.Date,
-			&i.CreatedAt,
-			&i.UpdatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
 }

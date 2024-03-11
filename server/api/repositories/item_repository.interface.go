@@ -7,4 +7,5 @@ import (
 
 type ItemRepositoryInterface interface {
 	CreateItem(ctx *gin.Context, itemToCreate db.CreateItemParams, listId int32) (db.Item, error)
+	GetItems(ctx *gin.Context, listId int32) ([]db.Item, error)
 }

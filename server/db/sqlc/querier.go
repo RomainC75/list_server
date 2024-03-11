@@ -13,6 +13,7 @@ type Querier interface {
 	CreateList(ctx context.Context, arg CreateListParams) (List, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	DeleteList(ctx context.Context, arg DeleteListParams) (List, error)
+	GetItemsByListName(ctx context.Context, id int32) ([]Item, error)
 	GetListForUpdate(ctx context.Context, arg GetListForUpdateParams) (List, error)
 	GetUser(ctx context.Context, id int32) (User, error)
 	GetUserByEmail(ctx context.Context, email string) (User, error)
@@ -20,7 +21,6 @@ type Querier interface {
 	Getlist(ctx context.Context, arg GetlistParams) (List, error)
 	Getlists(ctx context.Context, userID int32) ([]List, error)
 	LinkItemToList(ctx context.Context, arg LinkItemToListParams) (ListItem, error)
-	ListItems(ctx context.Context) ([]Item, error)
 	Listusers(ctx context.Context) ([]User, error)
 	// NO KEY : avoid dead-lock !
 	UpdateList(ctx context.Context, arg UpdateListParams) (List, error)
