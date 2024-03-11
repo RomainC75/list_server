@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -13,6 +14,7 @@ import (
 
 type Store interface {
 	Querier
+	ExecTx(ctx context.Context, fn func(*Queries) error) error
 }
 
 var DbStore *Store
@@ -27,6 +29,22 @@ func NewStore(db *sql.DB) Store {
 		db:      db,
 		Queries: New(db),
 	}
+}
+
+func (store *SqlStore) ExecTx(ctx context.Context, fn func(*Queries) error) error {
+	tx, err := store.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return err
+	}
+	q := New(tx)
+	err = fn(q)
+	if err != nil {
+		if rbErr := tx.Rollback(); rbErr != nil {
+			return fmt.Errorf("tx err: %v, rb err: %v", err, rbErr)
+		}
+		return err
+	}
+	return tx.Commit()
 }
 
 func Connect() {
