@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/RomainC75/todo2/api/dto/requests"
+	"github.com/RomainC75/todo2/api/dto/responses"
 	"github.com/RomainC75/todo2/api/services"
 	"github.com/RomainC75/todo2/utils/controller_utils"
 	"github.com/gin-gonic/gin"
@@ -45,7 +46,7 @@ func (itemCtrl *ItemCtrl) HandleCreateItem(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	c.JSON(http.StatusAccepted, gin.H{"created": createdItem})
+	c.JSON(http.StatusAccepted, gin.H{"created": responses.GetItemResponse(createdItem)})
 }
 
 func (itemCtrl *ItemCtrl) HandleGetItemsByListId(c *gin.Context) {
@@ -60,5 +61,5 @@ func (itemCtrl *ItemCtrl) HandleGetItemsByListId(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
-	c.JSON(http.StatusAccepted, gin.H{"found_items": itemsFound})
+	c.JSON(http.StatusAccepted, gin.H{"found_items": responses.GetItemsResponse(itemsFound)})
 }
