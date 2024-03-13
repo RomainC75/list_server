@@ -22,6 +22,7 @@ type Querier interface {
 	Getlists(ctx context.Context, userID int32) ([]List, error)
 	LinkItemToList(ctx context.Context, arg LinkItemToListParams) (ListItem, error)
 	Listusers(ctx context.Context) ([]User, error)
+	UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error)
 	// NO KEY : avoid dead-lock !
 	UpdateList(ctx context.Context, arg UpdateListParams) (List, error)
 }

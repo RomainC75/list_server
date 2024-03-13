@@ -63,3 +63,25 @@ func (itemCtrl *ItemCtrl) HandleGetItemsByListId(c *gin.Context) {
 	}
 	c.JSON(http.StatusAccepted, gin.H{"found_items": responses.GetItemsResponse(itemsFound)})
 }
+
+func (itemCtrl *ItemCtrl) HandleUpdateItem(c *gin.Context) {
+	itemId, err := controller_utils.GetIdFromParam(c, "itemId")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the item id from the url"})
+		return
+	}
+
+	var itemToUpdate requests.UpdateItemRequest
+
+	if err := c.ShouldBind(&itemToUpdate); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	updatedItem, err := itemCtrl.itemSrv.UpdateItem(c, itemId, itemToUpdate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"found_items": responses.GetItemResponse(updatedItem)})
+}

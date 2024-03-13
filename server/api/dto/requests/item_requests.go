@@ -7,3 +7,9 @@ type CreateItemRequest struct {
 	Description string    `json:"description"`
 	Date        time.Time `json:"date"`
 }
+
+type UpdateItemRequest struct {
+	Name        string    `json:"name"`
+	Description string    `json:"description"`
+	Date        time.Time `json:"date"`
+}

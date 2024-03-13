@@ -47,3 +47,8 @@ func (itemRepo *ItemRepository) GetItems(ctx *gin.Context, listId int32) ([]db.I
 	foundItems, err := (*itemRepo.Store).GetItemsByListName(ctx, listId)
 	return foundItems, err
 }
+
+func (itemRepo *ItemRepository) UpdateItem(ctx *gin.Context, arg db.UpdateItemParams) (db.Item, error) {
+	arg.UpdatedAt = time.Now()
+	return (*itemRepo.Store).UpdateItem(ctx, arg)
+}

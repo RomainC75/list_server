@@ -51,7 +51,6 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 	return i, err
 }
 
-
 const getItemsByListName = `-- name: GetItemsByListName :many
 SELECT items.id, items.name, items.description, items.date, items.created_at, items.updated_at FROM items 
 INNER JOIN list_item ON items.id=list_item.item_id 
@@ -125,5 +124,44 @@ func (q *Queries) LinkItemToList(ctx context.Context, arg LinkItemToListParams) 
 	row := q.db.QueryRowContext(ctx, linkItemToList, arg.ListID, arg.ItemID)
 	var i ListItem
 	err := row.Scan(&i.ID, &i.ListID, &i.ItemID)
+	return i, err
+}
+
+const updateItem = `-- name: UpdateItem :one
+UPDATE items
+SET
+name = coalesce($2, name),
+description = coalesce($3, description),
+date = coalesce($4, date),
+updated_at = $1
+WHERE items.id = $5
+RETURNING id, name, description, date, created_at, updated_at
+`
+
+type UpdateItemParams struct {
+	UpdatedAt   time.Time
+	Name        sql.NullString
+	Description sql.NullString
+	Date        sql.NullTime
+	ID          int32
+}
+
+func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, error) {
+	row := q.db.QueryRowContext(ctx, updateItem,
+		arg.UpdatedAt,
+		arg.Name,
+		arg.Description,
+		arg.Date,
+		arg.ID,
+	)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Date,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
 	return i, err
 }

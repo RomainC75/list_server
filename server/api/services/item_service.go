@@ -61,6 +61,17 @@ func (itemSrv *ItemSrv) GetItemsByListSrv(ctx *gin.Context, listId int32) ([]db.
 	return itemSrv.itemRepo.GetItems(ctx, listId)
 }
 
+func (itemSrv *ItemSrv) UpdateItem(ctx *gin.Context, itemId int32, itemRequest requests.UpdateItemRequest) (db.Item, error) {
+	// TODO : check if item exists
+	arg := db.UpdateItemParams{
+		ID:          itemId,
+		Name:        sql.NullString{String: itemRequest.Name, Valid: itemRequest.Name != ""},
+		Description: sql.NullString{String: itemRequest.Description, Valid: itemRequest.Description != ""},
+		Date:        sql.NullTime{Time: itemRequest.Date, Valid: !itemRequest.Date.IsZero()},
+	}
+	return itemSrv.itemRepo.UpdateItem(ctx, arg)
+}
+
 // func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {
 // 	foundList, err := listSrv.listRepository.GetListById(listId)
 // 	if err != nil {

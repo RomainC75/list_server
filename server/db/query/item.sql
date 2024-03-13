@@ -25,3 +25,13 @@ INSERT INTO list_item (
 )VALUES (
     $1, $2
 ) RETURNING *;
+
+-- name: UpdateItem :one
+UPDATE items
+SET
+name = coalesce(sqlc.narg('name'), name),
+description = coalesce(sqlc.narg('description'), description),
+date = coalesce(sqlc.narg('date'), date),
+updated_at = $1
+WHERE items.id = sqlc.arg('id')
+RETURNING *;
