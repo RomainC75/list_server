@@ -51,6 +51,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 	return i, err
 }
 
+
 const getItemsByListName = `-- name: GetItemsByListName :many
 SELECT items.id, items.name, items.description, items.date, items.created_at, items.updated_at FROM items 
 INNER JOIN list_item ON items.id=list_item.item_id 
