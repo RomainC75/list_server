@@ -26,9 +26,8 @@ func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
 
 	// Publish the message(context, message, queue Name)
 	pub := redis.GetPublisher()
-	pub.PublishMessages(ctx, "Test Message", "Test")
 
-	pub.PublishMessages(c, "mlksjdf", "myqueue")
+	pub.PublishMessages(ctx, "mlksjdf", "myqueue")
 	fmt.Println("==> message sent : ")
 	c.JSON(http.StatusAccepted, gin.H{"message": "got it"})
 }
