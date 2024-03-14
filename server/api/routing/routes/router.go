@@ -13,6 +13,7 @@ func RegisterRoutes(router *gin.Engine) {
 	AuthRoutes(router)
 	ListRoutes(router)
 	ItemRoutes(router)
+	WorkRoutes(router)
 
 	router.GET("/hello", func(c *gin.Context) {
 		fmt.Println("received")

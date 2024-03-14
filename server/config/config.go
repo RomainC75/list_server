@@ -5,6 +5,7 @@ type Config struct {
 	Server Server
 	DB     DB
 	Jwt    Jwt
+	Redis  Redis
 }
 
 type App struct {
@@ -27,4 +28,11 @@ type DB struct {
 type Jwt struct {
 	Secret          string
 	JwtValidityTime int
+}
+
+type Redis struct {
+	Host     string
+	Port     string
+	Username string
+	Password string
 }

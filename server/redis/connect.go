@@ -1,28 +1,46 @@
 package redis
 
 import (
-	"errors"
+	"context"
+	"fmt"
+	"log"
+	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/RomainC75/todo2/config"
+	"github.com/go-redis/redis/v8"
 )
 
 type Redis struct {
 	RedisClient redis.Client
 }
 
-func NewRedis(env Env) Redis {
+var redisClient Redis
 
+func ConnectRedis() {
+	config := config.Get()
 	var client = redis.NewClient(&redis.Options{
-		// Container name + port since we are using docker
-		Addr:     "redis:6379",
-		Password: env.RedisPassword,
+		Addr: fmt.Sprintf("%s:%s", config.Redis.Host, config.Redis.Port),
+		// Password: config.Redis.Password,
+		DB: 0,
 	})
+	err := client.Ping(context.Background()).Err()
+	if err != nil {
+		// Sleep for 3 seconds and wait for Redis to initialize
+		time.Sleep(3 * time.Second)
+		err := client.Ping(context.Background()).Err()
+		if err != nil {
+			panic(err)
+		}
+	}
 
 	if client == nil {
-		errors.New("Cannot run redis")
+		log.Fatal("Cannot run redis")
 	}
-
-	return Redis{
+	redisClient = Redis{
 		RedisClient: *client,
 	}
+}
+
+func Get() Redis {
+	return redisClient
 }

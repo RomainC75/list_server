@@ -13,6 +13,12 @@ db:
   port: "5432"
   name: "test"
 
+redis:
+  host: "redis"
+  port: "6379"
+  username: "name"
+  password: "pass"
+
 jwt:
   secret: "azerty"
   jwtValidityTime: 15
