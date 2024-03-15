@@ -1,5 +1,5 @@
 .env
 server/config/config.yml
-data/
+/data/
 
 redis/
