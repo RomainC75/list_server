@@ -20,14 +20,17 @@ func NewWorkCtrl() *ListCtrl {
 	}
 }
 
+type Message struct {
+	Message string `json:"message"`
+}
+
 func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
 	// Publish the message(context, message, queue Name)
 	pub := redis.GetPublisher()
-
-	pub.PublishMessages(ctx, "mlksjdf", "myqueue")
+	pub.PublishMessages(ctx, Message{"mklqjsdfm"}, "myqueue")
 	fmt.Println("==> message sent : ")
 	c.JSON(http.StatusAccepted, gin.H{"message": "got it"})
 }
