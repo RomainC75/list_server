@@ -2,4 +2,4 @@
 server/config/config.yml
 /data/
 
-redis/
+/redis/data
