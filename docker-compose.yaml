@@ -19,15 +19,42 @@ services:
     ports:
       - 8081:8080
 
-  api:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    command: go run main.go serve
+  # api:
+  #   build:
+  #     context: ./server
+  #     dockerfile: Dockerfile
+  #   command: go run main.go serve
+  #   ports:
+  #     - '5000:5000'
+  #   develop:
+  #     watch:
+  #       - action: sync+restart
+  #         path: ./server
+  #         target: /usr/src/app
+
+  # =========REDIS========
+  redis:
+    container_name: "redis"
+    image: redis:alpine
+    # Specify the redis.conf file to use
+    # command: redis-server /usr/local/etc/redis/redis.conf
+    # environment:
+    #   REDIS_ARGS: "--requirepass pass --user name on >password ~* allcommands --user default off nopass nocommands"
+    volumes:
+      - ./redis/data:/data #Used for persisting data
+      - ./redis/conf:/usr/local/etc/redis #Used for configuring redis
+    command: redis-server /usr/local/etc/redis/redis.conf
     ports:
-      - '5000:5000'
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./server
-          target: /usr/src/app
+      - "6379:6379"
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight:/data
+
+
+volumes:
+  redis-insight:

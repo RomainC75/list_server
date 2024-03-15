@@ -1,3 +1,5 @@
 .env
 server/config/config.yml
 data/
+
+redis/
