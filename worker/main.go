@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"os/signal"
+	redis_dto "worker/dto"
 
 	"github.com/RomainC75/todo2/utils"
 	"github.com/gocraft/work"
@@ -12,7 +14,6 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// Make a redis pool
 var redisPool *redis.Pool
 
 type Context struct {
@@ -56,7 +57,7 @@ func main() {
 	pool.Middleware((*Context).VerifyMiddleware)
 
 	// Job => JOB_QUEUE
-	pool.Job(redis_job_queue, (*Context).scan)
+	pool.Job(redis_job_queue, (*Context).Scan)
 
 	pool.JobWithOptions("export", work.JobOptions{Priority: 10, MaxFails: 1}, (*Context).Export)
 
@@ -72,7 +73,9 @@ func main() {
 }
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
-	utils.PrettyDisplay("starting job : ", job)
+	utils.PrettyDisplay(" LOG() : ", job)
+	utils.PrettyDisplay(" LOG POST() : ", job.Args["message"])
+
 	return next()
 }
 
@@ -81,8 +84,25 @@ func (c *Context) VerifyMiddleware(job *work.Job, next work.NextMiddlewareFunc) 
 	return next()
 }
 
-func (c *Context) scan(job *work.Job) error {
-	utils.PrettyDisplay("data for scanning: ", job)
+func (c *Context) Scan(job *work.Job) error {
+	utils.PrettyDisplay("data for scanning: ", job.Args["message"])
+
+	fmt.Println(".......")
+	addr := job.ArgString("message")
+	fmt.Println("=> message: ", addr)
+	if err := job.ArgError(); err != nil {
+		fmt.Println("=> error: ", err)
+		return err
+	}
+
+	var message redis_dto.ScanRequestMessage
+	if err := json.Unmarshal([]byte(addr), &message); err != nil {
+		return err
+	}
+	utils.PrettyDisplay("OBJECT ! ", message)
+
+	fmt.Println(".......", message.Address)
+
 	return nil
 }
 
