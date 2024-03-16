@@ -1,61 +1,91 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
-	"time"
+	"log"
+	"os"
+	"os/signal"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/RomainC75/todo2/utils"
+	"github.com/gocraft/work"
+	"github.com/gomodule/redigo/redis"
+	"github.com/joho/godotenv"
 )
 
+// Make a redis pool
+var redisPool *redis.Pool
+
+type Context struct {
+	customerID int64
+}
+
+func NewPool(domain string, port string) *redis.Pool {
+	return &redis.Pool{
+		MaxActive: 5,
+		MaxIdle:   5,
+		Wait:      true,
+		Dial: func() (redis.Conn, error) {
+			return redis.Dial("tcp", fmt.Sprintf("%s:%s", domain, port))
+		},
+	}
+}
+
 func main() {
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
-		// Password: "pass",
-		DB: 0,
-	})
-
-	err := redisClient.Ping(context.Background()).Err()
+	err := godotenv.Load(".env")
 	if err != nil {
-		time.Sleep(3 * time.Second)
-		err := redisClient.Ping(context.Background()).Err()
-		if err != nil {
-			panic(err)
-		}
+		log.Fatal("Error loading .env file")
+		return
 	}
-	ctx := context.Background()
-	topic := redisClient.Subscribe(ctx, "myqueue")
-	defer topic.Close()
+	redis_domain := os.Getenv("REDIS_DOMAIN")
+	redis_port := os.Getenv("REDIS_PORT")
+	redis_namespace := os.Getenv("REDIS_NAMESPACE")
+	redis_job_queue := os.Getenv("REDIS_JOB_QUEUE")
+	if redis_domain == "" || redis_port == "" || redis_namespace == "" || redis_job_queue == "" {
+		log.Fatal("Error loading .env file - check the variables !!!")
+		return
 
-	channel := topic.Channel()
-	for msg := range channel {
-		fmt.Println("=> payload : ", msg.Payload)
-		u := &Message{}
-		err := u.UnmarshalBinary([]byte(msg.Payload))
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println(u)
 	}
+
+	redisPool = NewPool(redis_domain, redis_port)
+
+	// WorkerPool => NAMESPACE
+	pool := work.NewWorkerPool(Context{}, 10, redis_namespace, redisPool)
+
+	// middlewares execute functions on each job !!
+	pool.Middleware((*Context).Log)
+	pool.Middleware((*Context).VerifyMiddleware)
+
+	// Job => JOB_QUEUE
+	pool.Job(redis_job_queue, (*Context).scan)
+
+	pool.JobWithOptions("export", work.JobOptions{Priority: 10, MaxFails: 1}, (*Context).Export)
+
+	// Start processing jobs
+	pool.Start()
+
+	// Wait for a signal to quit:
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, os.Interrupt, os.Kill)
+	<-signalChan
+
+	pool.Stop()
 }
 
-type Message struct {
-	Message string
+func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
+	utils.PrettyDisplay("starting job : ", job)
+	return next()
 }
 
-func (u *Message) MarshalBinary() ([]byte, error) {
-	return json.Marshal(u)
+func (c *Context) VerifyMiddleware(job *work.Job, next work.NextMiddlewareFunc) error {
+	// do something // return error if not valid
+	return next()
 }
 
-func (u *Message) UnmarshalBinary(data []byte) error {
-	if err := json.Unmarshal(data, u); err != nil {
-		return err
-	}
+func (c *Context) scan(job *work.Job) error {
+	utils.PrettyDisplay("data for scanning: ", job)
 	return nil
 }
 
-func (u *Message) String() string {
-	return "You received : " + u.Message
+func (c *Context) Export(job *work.Job) error {
+	return nil
 }

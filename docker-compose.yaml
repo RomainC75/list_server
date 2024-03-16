@@ -19,18 +19,18 @@ services:
     ports:
       - 8081:8080
 
-  api:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    command: go run main.go serve
-    ports:
-      - '5000:5000'
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./server
-          target: /usr/src/app
+  # api:
+  #   build:
+  #     context: ./server
+  #     dockerfile: Dockerfile
+  #   command: go run main.go serve
+  #   ports:
+  #     - '5000:5000'
+  #   develop:
+  #     watch:
+  #       - action: sync+restart
+  #         path: ./server
+  #         target: /usr/src/app
 
   # worker:
   #   build:

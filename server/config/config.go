@@ -31,8 +31,10 @@ type Jwt struct {
 }
 
 type Redis struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
+	Host         string
+	Port         string
+	Username     string
+	Password     string
+	TcpNameSpace string
+	TcpJobQueue  string
 }

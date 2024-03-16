@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 
@@ -22,9 +21,7 @@ func NewWorkCtrl() *ListCtrl {
 }
 
 func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
+	fmt.Println("mlqksjdmlqkjfdmlqskjfmlqksdjf")
 	var scanRequest requests.WorkRequest
 	if err := c.ShouldBindJSON(&scanRequest); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -36,8 +33,8 @@ func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
 	}
 
 	// Publish the message(context, message, queue Name)
-	pub := redis.GetPublisher()
-	pub.PublishMessages(ctx, scanRequest, "tcpScan")
+	pub := redis.GetJobQueue()
+	pub.PublishMessage(scanRequest, "myqueue")
 	fmt.Println("==> message sent : ")
 	c.JSON(http.StatusAccepted, gin.H{"message": "got it"})
 }

@@ -1,33 +1,36 @@
 package redis
 
 import (
-	"context"
-	"encoding/json"
 	"log"
+
+	"github.com/gocraft/work"
+	"github.com/gomodule/redigo/redis"
 )
 
-type MessagePublisher struct {
-	redisClient Redis
+type JobQueue struct {
+	enqueuer *work.Enqueuer
 }
 
-var publisher *MessagePublisher
+var jobQueue *JobQueue
 
-func CreateMessagePublisher(redisClient Redis) {
-	publisher = &MessagePublisher{redisClient}
+type JobQueueInterface interface {
+	PublishMessage(message interface{}, queueName string)
 }
 
-func GetPublisher() *MessagePublisher {
-	return publisher
-}
-
-func (p *MessagePublisher) PublishMessages(ctx context.Context, message interface{}, queueName string) {
-	serializedMessage, err := json.Marshal(message)
-	if err != nil {
-		log.Printf("==> [%s] Failed to serialize message: %v", queueName, err)
+func CreateMessagePublisher(redisClient *redis.Pool) {
+	jobQueue = &JobQueue{
+		enqueuer: work.NewEnqueuer("tcp_scan", redisClient),
 	}
+}
 
-	err = p.redisClient.RedisClient.Publish(ctx, queueName, serializedMessage).Err()
+func (jq *JobQueue) PublishMessage(message interface{}, queueName string) {
+	// w, err := (*jq).enqueuer.Enqueue("requests", work.Q{"address": "test@example.com", "subject": "hello world", "customer_id": 4})
+	_, err := (*jq).enqueuer.Enqueue("requests", work.Q{"message": message})
 	if err != nil {
-		log.Printf("==> [%s] Failed to publish message: %v", queueName, err)
+		log.Fatal(err)
 	}
+}
+
+func GetJobQueue() *JobQueue {
+	return jobQueue
 }
