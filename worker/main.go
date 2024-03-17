@@ -1,35 +1,14 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
-	redis_dto "worker/dto"
+	redisHandler "worker/redis"
 
-	"github.com/RomainC75/todo2/utils"
 	"github.com/gocraft/work"
-	"github.com/gomodule/redigo/redis"
 	"github.com/joho/godotenv"
 )
-
-var redisPool *redis.Pool
-
-type Context struct {
-	customerID int64
-}
-
-func NewPool(domain string, port string) *redis.Pool {
-	return &redis.Pool{
-		MaxActive: 5,
-		MaxIdle:   5,
-		Wait:      true,
-		Dial: func() (redis.Conn, error) {
-			return redis.Dial("tcp", fmt.Sprintf("%s:%s", domain, port))
-		},
-	}
-}
 
 func main() {
 	err := godotenv.Load(".env")
@@ -44,22 +23,23 @@ func main() {
 	if redis_domain == "" || redis_port == "" || redis_namespace == "" || redis_job_queue == "" {
 		log.Fatal("Error loading .env file - check the variables !!!")
 		return
-
 	}
 
-	redisPool = NewPool(redis_domain, redis_port)
+	redisHandler.NewPool(redis_domain, redis_port)
 
 	// WorkerPool => NAMESPACE
-	pool := work.NewWorkerPool(Context{}, 10, redis_namespace, redisPool)
+	pool := work.NewWorkerPool(redisHandler.Context{}, 10, redis_namespace, redisHandler.GetPool())
+	// Pub
+	redisHandler.CreateMessagePublisher(redisHandler.GetPool())
 
 	// middlewares execute functions on each job !!
-	pool.Middleware((*Context).Log)
-	pool.Middleware((*Context).VerifyMiddleware)
+	pool.Middleware((*redisHandler.Context).Log)
+	pool.Middleware((*redisHandler.Context).VerifyMiddleware)
 
 	// Job => JOB_QUEUE
-	pool.Job(redis_job_queue, (*Context).Scan)
+	pool.Job(redis_job_queue, (*redisHandler.Context).Scan)
 
-	pool.JobWithOptions("export", work.JobOptions{Priority: 10, MaxFails: 1}, (*Context).Export)
+	pool.JobWithOptions("export", work.JobOptions{Priority: 10, MaxFails: 1}, (*redisHandler.Context).Export)
 
 	// Start processing jobs
 	pool.Start()
@@ -70,42 +50,4 @@ func main() {
 	<-signalChan
 
 	pool.Stop()
-}
-
-func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
-	utils.PrettyDisplay(" LOG() : ", job)
-	utils.PrettyDisplay(" LOG POST() : ", job.Args["message"])
-
-	return next()
-}
-
-func (c *Context) VerifyMiddleware(job *work.Job, next work.NextMiddlewareFunc) error {
-	// do something // return error if not valid
-	return next()
-}
-
-func (c *Context) Scan(job *work.Job) error {
-	utils.PrettyDisplay("data for scanning: ", job.Args["message"])
-
-	fmt.Println(".......")
-	addr := job.ArgString("message")
-	fmt.Println("=> message: ", addr)
-	if err := job.ArgError(); err != nil {
-		fmt.Println("=> error: ", err)
-		return err
-	}
-
-	var message redis_dto.ScanRequestMessage
-	if err := json.Unmarshal([]byte(addr), &message); err != nil {
-		return err
-	}
-	utils.PrettyDisplay("OBJECT ! ", message)
-
-	fmt.Println(".......", message.Address)
-
-	return nil
-}
-
-func (c *Context) Export(job *work.Job) error {
-	return nil
 }

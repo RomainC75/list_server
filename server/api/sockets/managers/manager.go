@@ -46,7 +46,8 @@ type Manager struct {
 
 func New() *Manager {
 	manager := Manager{
-		jobs: make(JobList),
+		jobs:    make(JobList),
+		clients: make(ClientList),
 	}
 	return &manager
 }
@@ -64,6 +65,13 @@ func (m *Manager) ServeWS(w gin.ResponseWriter, r *http.Request, userData UserDa
 
 	m.AddClient(client)
 	go client.writeMessages()
+
+	client.ResponseToClient(SocketMessage.WebSocketMessage{
+		Type: "connection",
+		Content: map[string]string{
+			"message": "connected to server",
+		},
+	})
 }
 
 func (m *Manager) AddClient(client *Client) {
