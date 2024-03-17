@@ -6,6 +6,7 @@ type Config struct {
 	DB     DB
 	Jwt    Jwt
 	Redis  Redis
+	Front  Front
 }
 
 type App struct {
@@ -31,10 +32,16 @@ type Jwt struct {
 }
 
 type Redis struct {
-	Host         string
-	Port         string
-	Username     string
-	Password     string
-	TcpNameSpace string
-	TcpJobQueue  string
+	Host                      string
+	Port                      string
+	Username                  string
+	Password                  string
+	TcpNameSpace              string
+	TcpJobQueue               string
+	TcpJobQueueProgressionSub string
+}
+
+type Front struct {
+	Host string
+	Port string
 }

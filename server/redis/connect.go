@@ -37,18 +37,6 @@ func ConnectRedis() {
 	ping(redisClient.Get())
 }
 
-// func initStore(pool *redis.Pool) {
-// 	conn := pool.Get()
-// 	// defer conn.Close()
-
-// 	macs := []string{"00000C  Cisco", "00000D  FIBRONICS", "00000E  Fujitsu",
-// 		"00000F  Next", "000010  Hughes"}
-// 	for _, mac := range macs {
-// 		pair := strings.Split(mac, "  ")
-// 		set(conn, pair[0], pair[1])
-// 	}
-// }
-
 func ping(conn redis.Conn) {
 	_, err := redis.String(conn.Do("PING"))
 	if err != nil {

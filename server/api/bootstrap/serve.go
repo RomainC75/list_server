@@ -14,6 +14,7 @@ func Serve() {
 
 	redis.ConnectRedis()
 	redis.CreateMessagePublisher(redis.Get())
+	redis.Subscribe(redis.Get())
 
 	Routing.Init()
 
