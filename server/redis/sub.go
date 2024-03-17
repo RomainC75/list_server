@@ -18,13 +18,10 @@ type Context struct {
 
 func GoSubscribe(redisPool *redis.Pool) {
 	go func() {
-		fmt.Println("=> Subscribe()")
 		config := config.Get()
 
 		redis_namespace := config.Redis.TcpNameSpace
 		redis_job_queue := config.Redis.TcpJobQueueProgressionSub
-		fmt.Println("=> redis_namespace: ", redis_namespace)
-		fmt.Println("=> redis_job_queue: ", redis_job_queue)
 
 		// WorkerPool => NAMESPACE
 		pool := work.NewWorkerPool(Context{}, 10, redis_namespace, redisPool)
@@ -44,14 +41,9 @@ func GoSubscribe(redisPool *redis.Pool) {
 		// Wait for a signal to quit:
 		signalChan := make(chan os.Signal, 1)
 		signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM, os.Kill)
-		fmt.Println("======BEFORE==================> signalChan: ")
-		signal := <-signalChan
 
-		fmt.Println("=======AFTER=================> signalChan: ", signal)
-
+		<-signalChan
 		pool.Stop()
-		fmt.Println("=======RETURN =================> RETURN: ")
-
 	}()
 }
 
@@ -68,7 +60,7 @@ func (c *Context) VerifyMiddleware(job *work.Job, next work.NextMiddlewareFunc) 
 }
 
 func (c *Context) HandleProgression(job *work.Job) error {
-	fmt.Println("==> job : ", job)
+	fmt.Println("==> job : ", job.Args)
 	return nil
 }
 
