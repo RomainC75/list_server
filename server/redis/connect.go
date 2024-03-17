@@ -1,4 +1,4 @@
-package redis
+package redis_server_handler
 
 import (
 	"fmt"
@@ -29,7 +29,6 @@ func ConnectRedis() {
 				log.Printf("ERROR: fail init redis pool: %s", err.Error())
 				os.Exit(1)
 			}
-			fmt.Println("=> err inside: ", err)
 			return conn, err
 		},
 	}

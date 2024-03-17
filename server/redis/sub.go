@@ -1,9 +1,10 @@
-package redis
+package redis_server_handler
 
 import (
 	"fmt"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/RomainC75/todo2/config"
 	"github.com/RomainC75/todo2/utils"
@@ -15,33 +16,39 @@ type Context struct {
 	customerID int64
 }
 
-func Subscribe(redisPool *redis.Pool) {
-	config := config.Get()
+func GoSubscribe(redisPool *redis.Pool) {
+	go func() {
+		fmt.Println("=> Subscribe()")
+		config := config.Get()
 
-	redis_namespace := config.Redis.TcpNameSpace
-	redis_job_queue := config.Redis.TcpJobQueueProgressionSub
+		redis_namespace := config.Redis.TcpNameSpace
+		redis_job_queue := config.Redis.TcpJobQueueProgressionSub
+		fmt.Println("=> redis_namespace: ", redis_namespace)
+		fmt.Println("=> redis_job_queue: ", redis_job_queue)
 
-	// WorkerPool => NAMESPACE
-	pool := work.NewWorkerPool(Context{}, 10, redis_namespace, redisPool)
+		// WorkerPool => NAMESPACE
+		pool := work.NewWorkerPool(Context{}, 10, redis_namespace, redisPool)
 
-	// middlewares execute functions on each job !!
-	pool.Middleware((*Context).Log)
-	pool.Middleware((*Context).VerifyMiddleware)
+		// middlewares execute functions on each job !!
+		pool.Middleware((*Context).Log)
+		pool.Middleware((*Context).VerifyMiddleware)
 
-	// Job => JOB_QUEUE
-	pool.Job(redis_job_queue, (*Context).HandleProgression)
+		// Job => JOB_QUEUE
+		pool.Job(redis_job_queue, (*Context).HandleProgression)
 
-	pool.JobWithOptions("export", work.JobOptions{Priority: 10, MaxFails: 1}, (*Context).Export)
+		pool.JobWithOptions("export", work.JobOptions{Priority: 10, MaxFails: 1}, (*Context).Export)
 
-	// Start processing jobs
-	pool.Start()
+		// Start processing jobs
+		pool.Start()
 
-	// Wait for a signal to quit:
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt, os.Kill)
-	<-signalChan
+		// Wait for a signal to quit:
+		signalChan := make(chan os.Signal, 1)
+		signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
+		<-signalChan
 
-	pool.Stop()
+		pool.Stop()
+	}()
+
 }
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {

@@ -6,7 +6,7 @@ import (
 
 	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/services"
-	"github.com/RomainC75/todo2/redis"
+	redis_server_handler "github.com/RomainC75/todo2/redis"
 	redis_dto "github.com/RomainC75/todo2/redis/dto"
 	"github.com/gin-gonic/gin"
 )
@@ -38,7 +38,7 @@ func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
 		PortMax: scanRequest.PortMax,
 	}
 	// Publish the message(context, message, queue Name)
-	pub := redis.GetJobQueue()
+	pub := redis_server_handler.GetJobQueue()
 	pub.PublishMessage(workRequest, "myqueue")
 	fmt.Println("==> message sent : ")
 	c.JSON(http.StatusAccepted, gin.H{"message": "got it"})

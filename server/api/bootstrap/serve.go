@@ -1,10 +1,12 @@
 package bootstrap
 
 import (
+	"fmt"
+
 	Routing "github.com/RomainC75/todo2/api/routing"
 	"github.com/RomainC75/todo2/config"
 	db "github.com/RomainC75/todo2/db/sqlc"
-	"github.com/RomainC75/todo2/redis"
+	redis_server_handler "github.com/RomainC75/todo2/redis"
 )
 
 func Serve() {
@@ -12,9 +14,11 @@ func Serve() {
 
 	db.Connect()
 
-	redis.ConnectRedis()
-	redis.CreateMessagePublisher(redis.Get())
-	redis.Subscribe(redis.Get())
+	redis_server_handler.ConnectRedis()
+	redis_server_handler.CreateMessagePublisher(redis_server_handler.Get())
+	fmt.Println("pub done")
+	redis_server_handler.GoSubscribe(redis_server_handler.Get())
+	fmt.Println("sub done")
 
 	Routing.Init()
 
