@@ -1,8 +1,6 @@
 package bootstrap
 
 import (
-	"fmt"
-
 	Routing "github.com/RomainC75/todo2/api/routing"
 	"github.com/RomainC75/todo2/config"
 	db "github.com/RomainC75/todo2/db/sqlc"
@@ -17,16 +15,11 @@ func Serve() {
 
 	redis_server_handler.ConnectRedis()
 	redis_server_handler.CreateMessagePublisher(redis_server_handler.Get())
-	fmt.Println("pub done")
 	redis_server_handler.GoSubscribe(redis_server_handler.Get())
-	fmt.Println("sub done")
 
 	Routing.Init()
-	fmt.Println("====>serve done 1")
 
 	Routing.RegisterRoutes()
-	fmt.Println("====>serve done 2")
 
 	Routing.Serve()
-	fmt.Println("====>serve done 3")
 }
