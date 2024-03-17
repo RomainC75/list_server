@@ -20,9 +20,11 @@ type WorkCtrl struct {
 }
 
 func NewWorkCtrl() *WorkCtrl {
+	manager := Manager.New()
+	redis_server_handler.GoSubscribe(redis_server_handler.Get(), manager)
 	return &WorkCtrl{
 		listSrv: *services.NewListSrv(),
-		manager: Manager.New(),
+		manager: manager,
 	}
 }
 
@@ -62,7 +64,8 @@ func (workCtrl *WorkCtrl) HandleGetSocket(c *gin.Context) {
 
 	userUuid := uuid.New()
 	userData := Manager.UserData{
-		UserId: userUuid,
+		UserId:    userUuid,
+		RequestId: socketId,
 	}
 
 	workCtrl.manager.ServeWS(c.Writer, c.Request, userData)

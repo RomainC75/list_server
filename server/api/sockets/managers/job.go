@@ -24,7 +24,7 @@ type Room struct {
 	Clients ClientList
 }
 
-func NewRoom(manager *Manager, uuid uuid.UUID) *Room {
+func NewJob(manager *Manager, uuid uuid.UUID) *Room {
 	return &Room{
 		Id:      uuid,
 		Manager: manager,

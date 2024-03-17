@@ -15,6 +15,7 @@ type ClientList map[*Client]bool
 type UserData struct {
 	UserId    uuid.UUID
 	UserEmail string
+	RequestId uuid.UUID
 }
 
 type Client struct {
