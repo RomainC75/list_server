@@ -7,7 +7,6 @@ import (
 	"syscall"
 
 	"github.com/RomainC75/todo2/config"
-	"github.com/RomainC75/todo2/utils"
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
 )
@@ -48,8 +47,8 @@ func GoSubscribe(redisPool *redis.Pool) {
 }
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
-	utils.PrettyDisplay(" LOG() : ", job)
-	utils.PrettyDisplay(" LOG POST() : ", job.Args["message"])
+	// utils.PrettyDisplay(" LOG() : ", job)
+	// utils.PrettyDisplay(" LOG POST() : ", job.Args["message"])
 
 	return next()
 }

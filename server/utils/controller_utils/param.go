@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 func GetIdFromParam(c *gin.Context, paramName string) (int32, error) {
@@ -14,4 +15,13 @@ func GetIdFromParam(c *gin.Context, paramName string) (int32, error) {
 		return 0, errors.New("id not valid")
 	}
 	return int32(intId), nil
+}
+
+func GetUUIDFromParam(c *gin.Context, paramName string) (uuid.UUID, error) {
+	id := c.Param(paramName)
+	uuid, err := uuid.Parse(id)
+	if err != nil {
+		return uuid, errors.New("uuid not valid")
+	}
+	return uuid, nil
 }
