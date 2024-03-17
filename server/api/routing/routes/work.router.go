@@ -12,5 +12,6 @@ func WorkRoutes(router *gin.Engine) {
 	workGroup := router.Group("/work")
 	{
 		workGroup.POST("/", middlewares.IsAuth(false), workController.HandleCreateWork)
+		workGroup.GET("/socket/:socketId", workController.HandleGetSocket)
 	}
 }

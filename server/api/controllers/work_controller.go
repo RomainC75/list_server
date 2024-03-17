@@ -6,6 +6,7 @@ import (
 
 	"github.com/RomainC75/todo2/api/dto/requests"
 	"github.com/RomainC75/todo2/api/services"
+	Manager "github.com/RomainC75/todo2/api/sockets/managers"
 	redis_server_handler "github.com/RomainC75/todo2/redis"
 	redis_dto "github.com/RomainC75/todo2/redis/dto"
 	"github.com/RomainC75/todo2/utils/controller_utils"
@@ -15,15 +16,17 @@ import (
 
 type WorkCtrl struct {
 	listSrv services.ListSrv
+	manager Manager.ManagerInterface
 }
 
-func NewWorkCtrl() *ListCtrl {
-	return &ListCtrl{
+func NewWorkCtrl() *WorkCtrl {
+	return &WorkCtrl{
 		listSrv: *services.NewListSrv(),
+		manager: Manager.New(),
 	}
 }
 
-func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
+func (workCtrl *WorkCtrl) HandleCreateWork(c *gin.Context) {
 	fmt.Println("mlqksjdmlqkjfdmlqskjfmlqksdjf")
 	var scanRequest requests.WorkRequest
 	if err := c.ShouldBindJSON(&scanRequest); err != nil {
@@ -48,13 +51,21 @@ func (workCtrl *ListCtrl) HandleCreateWork(c *gin.Context) {
 	c.JSON(http.StatusAccepted, gin.H{"message": "work sent", "uuid": uuid.String()})
 }
 
-func (workCtrl *ListCtrl) HandleGetSocket(c *gin.Context) {
+func (workCtrl *WorkCtrl) HandleGetSocket(c *gin.Context) {
+	fmt.Println("=====================/GET socket============================")
 	socketId, err := controller_utils.GetUUIDFromParam(c, "socketId")
 	//int32
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 		return
 	}
+
+	userUuid := uuid.New()
+	userData := Manager.UserData{
+		UserId: userUuid,
+	}
+
+	workCtrl.manager.ServeWS(c.Writer, c.Request, userData)
 
 	fmt.Println("socketId: ", socketId)
 }
