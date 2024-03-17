@@ -10,6 +10,7 @@ import (
 )
 
 func Serve() {
+
 	config.Set()
 
 	db.Connect()
@@ -21,8 +22,11 @@ func Serve() {
 	fmt.Println("sub done")
 
 	Routing.Init()
+	fmt.Println("====>serve done 1")
 
 	Routing.RegisterRoutes()
+	fmt.Println("====>serve done 2")
 
 	Routing.Serve()
+	fmt.Println("====>serve done 3")
 }

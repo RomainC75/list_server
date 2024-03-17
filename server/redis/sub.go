@@ -43,12 +43,16 @@ func GoSubscribe(redisPool *redis.Pool) {
 
 		// Wait for a signal to quit:
 		signalChan := make(chan os.Signal, 1)
-		signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
-		<-signalChan
+		signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM, os.Kill)
+		fmt.Println("======BEFORE==================> signalChan: ")
+		signal := <-signalChan
+
+		fmt.Println("=======AFTER=================> signalChan: ", signal)
 
 		pool.Stop()
-	}()
+		fmt.Println("=======RETURN =================> RETURN: ")
 
+	}()
 }
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
