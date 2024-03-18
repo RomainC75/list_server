@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 WORKDIR /usr/src/app
 
 COPY go.* .
-COPY ./common ../common
+# COPY ./common ../common
 
 RUN go mod tidy
 RUN go mod verify

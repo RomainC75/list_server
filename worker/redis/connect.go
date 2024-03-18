@@ -7,7 +7,6 @@ import (
 	"time"
 	redis_dto "worker/dto"
 
-	"github.com/RomainC75/todo2/utils"
 	"github.com/gocraft/work"
 	"github.com/gomodule/redigo/redis"
 )
@@ -34,8 +33,7 @@ func GetPool() *redis.Pool {
 }
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
-	utils.PrettyDisplay(" LOG() : ", job)
-	utils.PrettyDisplay(" LOG POST() : ", job.Args["message"])
+	fmt.Println(" LOG POST() : ", job.Args["message"])
 
 	return next()
 }
@@ -46,7 +44,6 @@ func (c *Context) VerifyMiddleware(job *work.Job, next work.NextMiddlewareFunc) 
 }
 
 func (c *Context) Scan(job *work.Job) error {
-	utils.PrettyDisplay("data for scanning: ", job.Args["message"])
 
 	fmt.Println(".......")
 	addr := job.ArgString("message")
@@ -60,7 +57,6 @@ func (c *Context) Scan(job *work.Job) error {
 	if err := json.Unmarshal([]byte(addr), &message); err != nil {
 		return err
 	}
-	utils.PrettyDisplay("OBJECT ! ", message)
 
 	for i := 0; i < 20; i++ {
 		// TODO: use .env !!
