@@ -19,14 +19,13 @@ type Context struct {
 
 func GoSubscribe(redisPool *redis.Pool, manager *Manager.Manager) {
 	go func() {
+
 		config := config.Get()
 
 		redis_namespace := config.Redis.TcpNameSpace
 		redis_job_queue := config.Redis.TcpJobQueueProgressionSub
 
-		// WorkerPool => NAMESPACE
-		context := Context{manager: manager}
-		pool := work.NewWorkerPool(context, 10, redis_namespace, redisPool)
+		pool := work.NewWorkerPool(Context{}, 10, redis_namespace, redisPool)
 
 		// middlewares execute functions on each job !!
 		pool.Middleware((*Context).Log)
@@ -51,8 +50,6 @@ func GoSubscribe(redisPool *redis.Pool, manager *Manager.Manager) {
 
 func (c *Context) Log(job *work.Job, next work.NextMiddlewareFunc) error {
 	// utils.PrettyDisplay(" LOG() : ", job)
-	// utils.PrettyDisplay(" LOG POST() : ", job.Args["message"])
-
 	return next()
 }
 
@@ -62,9 +59,8 @@ func (c *Context) VerifyMiddleware(job *work.Job, next work.NextMiddlewareFunc) 
 }
 
 func (c *Context) HandleProgression(job *work.Job) error {
-
-	fmt.Println("==> job : ", job.Args)
-
+	// TODO : CONTEXT.manager is 'nil'
+	fmt.Println("===> ", job.Args)
 	return nil
 }
 

@@ -29,7 +29,6 @@ func NewWorkCtrl() *WorkCtrl {
 }
 
 func (workCtrl *WorkCtrl) HandleCreateWork(c *gin.Context) {
-	fmt.Println("mlqksjdmlqkjfdmlqskjfmlqksdjf")
 	var scanRequest requests.WorkRequest
 	if err := c.ShouldBindJSON(&scanRequest); err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -48,13 +47,12 @@ func (workCtrl *WorkCtrl) HandleCreateWork(c *gin.Context) {
 	}
 	// Publish the message(context, message, queue Name)
 	pub := redis_server_handler.GetJobQueue()
+
 	pub.PublishMessage(workRequest, "myqueue")
-	fmt.Println("==> message sent : ")
 	c.JSON(http.StatusAccepted, gin.H{"message": "work sent", "uuid": uuid.String()})
 }
 
 func (workCtrl *WorkCtrl) HandleGetSocket(c *gin.Context) {
-	fmt.Println("=====================/GET socket============================")
 	socketId, err := controller_utils.GetUUIDFromParam(c, "socketId")
 	//int32
 	if err != nil {

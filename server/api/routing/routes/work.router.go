@@ -8,7 +8,6 @@ import (
 
 func WorkRoutes(router *gin.Engine) {
 	workController := controllers.NewWorkCtrl()
-
 	workGroup := router.Group("/work")
 	{
 		workGroup.POST("/", middlewares.IsAuth(false), workController.HandleCreateWork)

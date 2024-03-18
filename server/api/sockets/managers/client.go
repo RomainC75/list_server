@@ -24,7 +24,7 @@ type Client struct {
 	connection   *websocket.Conn
 	manager      *Manager
 	egress       chan []byte
-	Room         *Room
+	Job          *Job
 	PlayerNumber int
 	CommandIn    chan int
 	LastCommand  int
@@ -38,10 +38,6 @@ func NewClient(conn *websocket.Conn, manager *Manager, userData UserData) *Clien
 		egress:     make(chan []byte),
 	}
 }
-
-// func (c *Client) WriteLastCommand(){
-// 	c.L
-// }
 
 func (c *Client) writeMessages() {
 	defer func() {

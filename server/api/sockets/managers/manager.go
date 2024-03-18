@@ -53,7 +53,6 @@ func New() *Manager {
 }
 
 func (m *Manager) ServeWS(w gin.ResponseWriter, r *http.Request, userData UserData) {
-	log.Println("new Connection")
 	conn, err := websocketUpgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -65,7 +64,8 @@ func (m *Manager) ServeWS(w gin.ResponseWriter, r *http.Request, userData UserDa
 
 	m.AddClient(client)
 	go client.writeMessages()
-
+	m.CreateJob(client)
+	// test ...
 	client.ResponseToClient(SocketMessage.WebSocketMessage{
 		Type: "connection",
 		Content: map[string]string{
@@ -92,11 +92,27 @@ func (m *Manager) RemoveClient(client *Client) {
 	}
 }
 
+func (m *Manager) CreateJob(client *Client) *Job {
+	m.Lock()
+	defer m.Unlock()
+
+	//create Job
+
+	newJob := NewJob(m, client)
+	// add it to the job
+	m.jobs[newJob] = true
+	// add the job to the client
+	client.Job = newJob
+
+	return newJob
+}
+
 func (m *Manager) BroadcastMessage(mType string, content map[string]string) {
 	wsMessage := SocketMessage.WebSocketMessage{
 		Type:    mType,
 		Content: content,
 	}
+	fmt.Println("++++++broadcasting message", m.clients)
 	for client := range m.clients {
 		fmt.Println("send.....")
 		b, _ := json.Marshal(wsMessage)
