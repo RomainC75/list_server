@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"database/sql"
 	"net/http"
 
 	"github.com/RomainC75/todo2/api/dto/requests"
@@ -77,8 +78,18 @@ func (itemCtrl *ItemCtrl) HandleUpdateItem(c *gin.Context) {
 		return
 	}
 
-	updatedItem, err := itemCtrl.itemSrv.UpdateItem(c, itemId, itemToUpdate)
+	userId, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
+		return
+	}
+
+	updatedItem, err := itemCtrl.itemSrv.UpdateItem(c, itemId, userId.(int32), itemToUpdate)
 	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "item not found"})
+			return
+		}
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}

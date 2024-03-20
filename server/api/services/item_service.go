@@ -62,7 +62,7 @@ func (itemSrv *ItemSrv) GetItemsByListSrv(ctx *gin.Context, listId int32) ([]db.
 	return itemSrv.itemRepo.GetItems(ctx, listId)
 }
 
-func (itemSrv *ItemSrv) UpdateItem(ctx *gin.Context, itemId int32, itemRequest requests.UpdateItemRequest) (db.Item, error) {
+func (itemSrv *ItemSrv) UpdateItem(ctx *gin.Context, itemId int32, userId int32, itemRequest requests.UpdateItemRequest) (db.Item, error) {
 	// TODO : check if item exists
 	arg := db.UpdateItemParams{
 		ID:          itemId,

@@ -9,5 +9,5 @@ import (
 type ItemSrvInterface interface {
 	CreateItemSrv(ctx *gin.Context, userId uint, listId int32, item requests.CreateItemRequest) (db.Item, error)
 	GetItemsByListSrv(ctx *gin.Context, listId int32) ([]db.Item, error)
-	UpdateItem(ctx *gin.Context, itemId int32, itemRequest requests.UpdateItemRequest) (db.Item, error)
+	UpdateItem(ctx *gin.Context, itemId int32, userId int32, itemRequest requests.UpdateItemRequest) (db.Item, error)
 }
