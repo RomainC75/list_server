@@ -95,3 +95,28 @@ func (itemCtrl *ItemCtrl) HandleUpdateItem(c *gin.Context) {
 	}
 	c.JSON(http.StatusAccepted, gin.H{"found_items": responses.GetItemResponse(updatedItem)})
 }
+
+func (itemCtrl *ItemCtrl) HandleDeleteItem(c *gin.Context) {
+	itemId, err := controller_utils.GetIdFromParam(c, "itemId")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the item id from the url"})
+		return
+	}
+
+	userId, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
+		return
+	}
+
+	deletedItem, err := itemCtrl.itemSrv.DeleteItem(c, itemId, userId.(int32))
+	if err != nil {
+		if err == sql.ErrNoRows {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "item not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"found_items": responses.GetItemResponse(deletedItem)})
+}

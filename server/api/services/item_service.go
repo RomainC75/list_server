@@ -73,8 +73,12 @@ func (itemSrv *ItemSrv) UpdateItem(ctx *gin.Context, itemId int32, userId int32,
 	return itemSrv.itemRepo.UpdateItem(ctx, arg)
 }
 
-func (itemSrv *ItemSrv) DeleteItem(ctx *gin.Context, itemId int32) {
-
+func (itemSrv *ItemSrv) DeleteItem(ctx *gin.Context, itemId int32, itemCreatorId int32) (db.Item, error) {
+	arg := db.DeleteItemParams{
+		ID:            itemId,
+		UserCreatorID: itemCreatorId,
+	}
+	return itemSrv.itemRepo.DeleteItem(ctx, arg)
 }
 
 // func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {

@@ -15,6 +15,6 @@ func ItemRoutes(router *gin.Engine) {
 		// itemGroup.GET("/", middlewares.IsAuth(false), itemController.HandleGetListsFromUser)
 		itemGroup.GET("/:listId", middlewares.IsAuth(false), itemController.HandleGetItemsByListId)
 		itemGroup.PUT("/:itemId", middlewares.IsAuth(false), itemController.HandleUpdateItem)
-		// itemGroup.DELETE("/:listId", middlewares.IsAuth(false), itemController.HandleDeleteList)
+		itemGroup.DELETE("/:itemId", middlewares.IsAuth(false), itemController.HandleDeleteItem)
 	}
 }

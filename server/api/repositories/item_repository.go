@@ -52,3 +52,22 @@ func (itemRepo *ItemRepository) UpdateItem(ctx *gin.Context, arg db.UpdateItemPa
 	arg.UpdatedAt = time.Now()
 	return (*itemRepo.Store).UpdateItem(ctx, arg)
 }
+
+func (itemRepo *ItemRepository) DeleteItem(ctx *gin.Context, arg db.DeleteItemParams) (db.Item, error) {
+	var deletedItem db.Item
+	err := (*itemRepo.Store).ExecTx(ctx, func(q *db.Queries) error {
+		var err error
+
+		_, err = q.DeleteItemRelations(ctx, arg.ID)
+		if err != nil {
+			return err
+		}
+
+		deletedItem, err = q.DeleteItem(ctx, arg)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return deletedItem, err
+}
