@@ -108,5 +108,4 @@ func (listCtrl *ListCtrl) HandleDeleteList(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusUnauthorized, gin.H{"deleted_list": responses.GetListResponseFromModel(deletedList)})
-
 }

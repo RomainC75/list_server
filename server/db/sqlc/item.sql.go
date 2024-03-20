@@ -17,18 +17,20 @@ INSERT INTO items (
     description,
     date,
     created_at,
-    updated_at
+    updated_at,
+    user_creator_id
 ) VALUES (
-    $1, $2, $3, $4, $5
-) RETURNING id, name, description, date, created_at, updated_at
+    $1, $2, $3, $4, $5, $6
+) RETURNING id, name, description, date, created_at, updated_at, user_creator_id
 `
 
 type CreateItemParams struct {
-	Name        string
-	Description sql.NullString
-	Date        sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	Name          string
+	Description   sql.NullString
+	Date          sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	UserCreatorID int32
 }
 
 func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, error) {
@@ -38,6 +40,7 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		arg.Date,
 		arg.CreatedAt,
 		arg.UpdatedAt,
+		arg.UserCreatorID,
 	)
 	var i Item
 	err := row.Scan(
@@ -47,12 +50,68 @@ func (q *Queries) CreateItem(ctx context.Context, arg CreateItemParams) (Item, e
 		&i.Date,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserCreatorID,
 	)
 	return i, err
 }
 
+const deleteItem = `-- name: DeleteItem :one
+DELETE FROM items
+WHERE id=$1 AND user_creator_id=$2
+RETURNING id, name, description, date, created_at, updated_at, user_creator_id
+`
+
+type DeleteItemParams struct {
+	ID            int32
+	UserCreatorID int32
+}
+
+func (q *Queries) DeleteItem(ctx context.Context, arg DeleteItemParams) (Item, error) {
+	row := q.db.QueryRowContext(ctx, deleteItem, arg.ID, arg.UserCreatorID)
+	var i Item
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Date,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.UserCreatorID,
+	)
+	return i, err
+}
+
+const deleteItemRelations = `-- name: DeleteItemRelations :many
+DELETE FROM list_item
+WHERE item_id=$1
+RETURNING id, list_id, item_id
+`
+
+func (q *Queries) DeleteItemRelations(ctx context.Context, itemID int32) ([]ListItem, error) {
+	rows, err := q.db.QueryContext(ctx, deleteItemRelations, itemID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []ListItem{}
+	for rows.Next() {
+		var i ListItem
+		if err := rows.Scan(&i.ID, &i.ListID, &i.ItemID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getItemsByListName = `-- name: GetItemsByListName :many
-SELECT items.id, items.name, items.description, items.date, items.created_at, items.updated_at FROM items 
+SELECT items.id, items.name, items.description, items.date, items.created_at, items.updated_at, items.user_creator_id FROM items 
 INNER JOIN list_item ON items.id=list_item.item_id 
 INNER JOIN lists ON list_item.list_id = lists.id
 WHERE lists.id = $1
@@ -74,6 +133,7 @@ func (q *Queries) GetItemsByListName(ctx context.Context, id int32) ([]Item, err
 			&i.Date,
 			&i.CreatedAt,
 			&i.UpdatedAt,
+			&i.UserCreatorID,
 		); err != nil {
 			return nil, err
 		}
@@ -89,7 +149,7 @@ func (q *Queries) GetItemsByListName(ctx context.Context, id int32) ([]Item, err
 }
 
 const getitem = `-- name: Getitem :one
-SELECT id, name, description, date, created_at, updated_at FROM items WHERE id = $1
+SELECT id, name, description, date, created_at, updated_at, user_creator_id FROM items WHERE id = $1
 `
 
 func (q *Queries) Getitem(ctx context.Context, id int32) (Item, error) {
@@ -102,6 +162,7 @@ func (q *Queries) Getitem(ctx context.Context, id int32) (Item, error) {
 		&i.Date,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserCreatorID,
 	)
 	return i, err
 }
@@ -135,7 +196,7 @@ description = coalesce($3, description),
 date = coalesce($4, date),
 updated_at = $1
 WHERE items.id = $5
-RETURNING id, name, description, date, created_at, updated_at
+RETURNING id, name, description, date, created_at, updated_at, user_creator_id
 `
 
 type UpdateItemParams struct {
@@ -162,6 +223,7 @@ func (q *Queries) UpdateItem(ctx context.Context, arg UpdateItemParams) (Item, e
 		&i.Date,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.UserCreatorID,
 	)
 	return i, err
 }

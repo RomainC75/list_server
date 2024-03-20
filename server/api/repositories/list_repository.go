@@ -39,7 +39,7 @@ func (listRepo *ListRepository) GetLists(ctx *gin.Context, userId int32) ([]db.L
 func (listRepo *ListRepository) GetListByIdByOwner(ctx *gin.Context, getListParams db.GetlistParams) (db.List, error) {
 	foundList, err := (*listRepo.Store).Getlist(ctx, getListParams)
 	if err == sql.ErrNoRows {
-		fmt.Println("list not found : ", err.Error())
+		fmt.Println("list not found or you do not have the right to change it : ", err.Error())
 		return db.List{}, errors.New("no list found")
 	}
 	return foundList, err

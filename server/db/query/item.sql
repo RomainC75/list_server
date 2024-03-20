@@ -13,9 +13,10 @@ INSERT INTO items (
     description,
     date,
     created_at,
-    updated_at
+    updated_at,
+    user_creator_id
 ) VALUES (
-    $1, $2, $3, $4, $5
+    $1, $2, $3, $4, $5, $6
 ) RETURNING *;
 
 -- name: LinkItemToList :one
@@ -34,4 +35,14 @@ description = coalesce(sqlc.narg('description'), description),
 date = coalesce(sqlc.narg('date'), date),
 updated_at = $1
 WHERE items.id = sqlc.arg('id')
+RETURNING *;
+
+-- name: DeleteItem :one
+DELETE FROM items
+WHERE id=$1 AND user_creator_id=$2
+RETURNING *;
+
+-- name: DeleteItemRelations :many
+DELETE FROM list_item
+WHERE item_id=$1
 RETURNING *;

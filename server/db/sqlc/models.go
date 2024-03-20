@@ -10,12 +10,13 @@ import (
 )
 
 type Item struct {
-	ID          int32
-	Name        string
-	Description sql.NullString
-	Date        sql.NullTime
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	ID            int32
+	Name          string
+	Description   sql.NullString
+	Date          sql.NullTime
+	CreatedAt     time.Time
+	UpdatedAt     time.Time
+	UserCreatorID int32
 }
 
 type List struct {

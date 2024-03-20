@@ -41,9 +41,8 @@ func (itemCtrl *ItemCtrl) HandleCreateItem(c *gin.Context) {
 	}
 
 	createdItem, err := itemCtrl.itemSrv.CreateItemSrv(c, userId.(int32), listId, newItem)
-
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"created": responses.GetItemResponse(createdItem)})

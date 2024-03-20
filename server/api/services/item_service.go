@@ -41,6 +41,7 @@ func (itemSrv *ItemSrv) CreateItemSrv(ctx *gin.Context, userId int32, listId int
 			String: item.Description,
 			Valid:  true,
 		},
+		UserCreatorID: userId,
 	}
 	if !item.Date.IsZero() {
 		itemToCreate.Date = sql.NullTime{
@@ -70,6 +71,10 @@ func (itemSrv *ItemSrv) UpdateItem(ctx *gin.Context, itemId int32, itemRequest r
 		Date:        sql.NullTime{Time: itemRequest.Date, Valid: !itemRequest.Date.IsZero()},
 	}
 	return itemSrv.itemRepo.UpdateItem(ctx, arg)
+}
+
+func (itemSrv *ItemSrv) DeleteItem(ctx *gin.Context, itemId int32) {
+
 }
 
 // func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {

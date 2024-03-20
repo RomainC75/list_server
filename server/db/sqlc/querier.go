@@ -12,6 +12,8 @@ type Querier interface {
 	CreateItem(ctx context.Context, arg CreateItemParams) (Item, error)
 	CreateList(ctx context.Context, arg CreateListParams) (List, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
+	DeleteItem(ctx context.Context, arg DeleteItemParams) (Item, error)
+	DeleteItemRelations(ctx context.Context, itemID int32) ([]ListItem, error)
 	DeleteList(ctx context.Context, arg DeleteListParams) (List, error)
 	GetItemsByListName(ctx context.Context, id int32) ([]Item, error)
 	GetListForUpdate(ctx context.Context, arg GetListForUpdateParams) (List, error)

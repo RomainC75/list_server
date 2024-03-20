@@ -22,9 +22,10 @@ CREATE TABLE items (
     description TEXT,
     date TIMESTAMP,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP NOT NULL
+    updated_at TIMESTAMP NOT NULL,
+    user_creator_id INT NOT NULL,
+    FOREIGN KEY (user_creator_id) REFERENCES users(id)
 );
-
 
 CREATE TABLE list_item (
     id SERIAL PRIMARY KEY,
@@ -33,4 +34,3 @@ CREATE TABLE list_item (
     FOREIGN KEY (list_id) REFERENCES lists(id),
     FOREIGN KEY (item_id) REFERENCES items(id)
 );
-
