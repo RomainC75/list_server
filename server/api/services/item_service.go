@@ -2,6 +2,7 @@ package services
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/RomainC75/todo2/api/dto/requests"
@@ -21,6 +22,10 @@ func NewItemSrv() *ItemSrv {
 		itemRepo: repositories.NewItemRepo(),
 		listRepo: repositories.NewListRepo(),
 	}
+}
+
+func (itemSrv *ItemSrv) GetAvailableItems(ctx *gin.Context) ([]db.Item, error) {
+	return itemSrv.itemRepo.GetEveryItems(ctx)
 }
 
 func (itemSrv *ItemSrv) CreateItemSrv(ctx *gin.Context, userId int32, listId int32, item requests.CreateItemRequest) (db.Item, error) {
@@ -81,15 +86,21 @@ func (itemSrv *ItemSrv) DeleteItem(ctx *gin.Context, itemId int32, itemCreatorId
 	return itemSrv.itemRepo.DeleteItem(ctx, arg)
 }
 
-// func (listSrv *ListSrv) GetListOwnedByUser(userId uint, listId uint) (db.List, error) {
-// 	foundList, err := listSrv.listRepository.GetListById(listId)
-// 	if err != nil {
-// 		return db.List{}, err
-// 	}
+func (itemSrv *ItemSrv) AddItemToList(ctx *gin.Context, userId int32, listId int32, itemId int32) error {
+	_, err := itemSrv.listRepo.GetListByIdByOwner(ctx, db.GetlistParams{
+		ID:     listId,
+		UserID: userId,
+	})
+	if err != nil {
+		return errors.New("list not found/owned")
+	}
 
-// 	if foundList.UserRefer != userId {
-// 		return db.List{}, errors.New("not the owner of this list")
-// 	}
-
-// 	return foundList, nil
-// }
+	_, err = itemSrv.itemRepo.LinkItemToList(ctx, db.LinkItemToListParams{
+		ListID: listId,
+		ItemID: itemId,
+	})
+	if err != nil {
+		return errors.New("item does not exist")
+	}
+	return nil
+}

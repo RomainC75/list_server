@@ -19,6 +19,10 @@ func NewItemRepo() *ItemRepository {
 	}
 }
 
+func (itemRepo *ItemRepository) GetEveryItems(ctx *gin.Context) ([]db.Item, error) {
+	return (*itemRepo.Store).GetEveryItems(ctx)
+}
+
 func (itemRepo *ItemRepository) CreateItem(ctx *gin.Context, itemToCreate db.CreateItemParams, listId int32) (db.Item, error) {
 	var createdItem db.Item
 	err := (*itemRepo.Store).ExecTx(ctx, func(q *db.Queries) error {
@@ -70,4 +74,8 @@ func (itemRepo *ItemRepository) DeleteItem(ctx *gin.Context, arg db.DeleteItemPa
 		return nil
 	})
 	return deletedItem, err
+}
+
+func (itemRepo *ItemRepository) LinkItemToList(ctx *gin.Context, arg db.LinkItemToListParams) (db.ListItem, error) {
+	return (*itemRepo.Store).LinkItemToList(ctx, arg)
 }

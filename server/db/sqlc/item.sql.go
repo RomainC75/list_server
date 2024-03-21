@@ -110,6 +110,41 @@ func (q *Queries) DeleteItemRelations(ctx context.Context, itemID int32) ([]List
 	return items, nil
 }
 
+const getEveryItems = `-- name: GetEveryItems :many
+SELECT id, name, description, date, created_at, updated_at, user_creator_id FROM items
+`
+
+func (q *Queries) GetEveryItems(ctx context.Context) ([]Item, error) {
+	rows, err := q.db.QueryContext(ctx, getEveryItems)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	items := []Item{}
+	for rows.Next() {
+		var i Item
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Date,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+			&i.UserCreatorID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getItemsByListName = `-- name: GetItemsByListName :many
 SELECT items.id, items.name, items.description, items.date, items.created_at, items.updated_at, items.user_creator_id FROM items 
 INNER JOIN list_item ON items.id=list_item.item_id 

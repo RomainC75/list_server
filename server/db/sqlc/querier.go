@@ -15,6 +15,7 @@ type Querier interface {
 	DeleteItem(ctx context.Context, arg DeleteItemParams) (Item, error)
 	DeleteItemRelations(ctx context.Context, itemID int32) ([]ListItem, error)
 	DeleteList(ctx context.Context, arg DeleteListParams) (List, error)
+	GetEveryItems(ctx context.Context) ([]Item, error)
 	GetItemsByListName(ctx context.Context, id int32) ([]Item, error)
 	GetListForUpdate(ctx context.Context, arg GetListForUpdateParams) (List, error)
 	GetUser(ctx context.Context, id int32) (User, error)

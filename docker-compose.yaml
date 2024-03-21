@@ -26,11 +26,11 @@ services:
   #   command: go run main.go serve
   #   ports:
   #     - '5000:5000'
-  #   develop:
-  #     watch:
-  #       - action: sync+restart
-  #         path: ./server
-  #         target: /usr/src/app
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./server
+    #       target: /usr/src/app
 
   # worker:
   #   build:
@@ -41,11 +41,12 @@ services:
   #     - api
     # networks:
     #   - redis_worker
-  # =========REDIS========
+  
+
   redis:
     container_name: "redis"
     image: redis:alpine
-    # Specify the redis.conf file to use
+    # Specify the redis.conf file to use !!
     # command: redis-server /usr/local/etc/redis/redis.conf
     # environment:
     #   REDIS_ARGS: "--requirepass pass --user name on >password ~* allcommands --user default off nopass nocommands"

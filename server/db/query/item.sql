@@ -1,6 +1,9 @@
 -- name: Getitem :one
 SELECT * FROM items WHERE id = $1;
 
+-- name: GetEveryItems :many
+SELECT * FROM items;
+
 -- name: GetItemsByListName :many
 SELECT items.* FROM items 
 INNER JOIN list_item ON items.id=list_item.item_id 
@@ -46,3 +49,4 @@ RETURNING *;
 DELETE FROM list_item
 WHERE item_id=$1
 RETURNING *;
+

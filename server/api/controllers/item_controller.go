@@ -21,6 +21,15 @@ func NewItemCtrl() *ItemCtrl {
 	}
 }
 
+func (itemCtrl *ItemCtrl) HandleGetAvailableItems(c *gin.Context) {
+	foundItems, err := itemCtrl.itemSrv.GetAvailableItems(c)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusUnprocessableEntity, gin.H{"available_items": foundItems})
+}
+
 func (itemCtrl *ItemCtrl) HandleCreateItem(c *gin.Context) {
 	var newItem requests.CreateItemRequest
 
@@ -103,11 +112,11 @@ func (itemCtrl *ItemCtrl) HandleDeleteItem(c *gin.Context) {
 		return
 	}
 
-	userId, exists := c.Get("user_id")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
-		return
-	}
+	userId, _ := c.Get("user_id")
+	// if !exists {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the userID"})
+	// 	return
+	// }
 
 	deletedItem, err := itemCtrl.itemSrv.DeleteItem(c, itemId, userId.(int32))
 	if err != nil {
@@ -119,4 +128,25 @@ func (itemCtrl *ItemCtrl) HandleDeleteItem(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusAccepted, gin.H{"found_items": responses.GetItemResponse(deletedItem)})
+}
+
+func (itemCtrl *ItemCtrl) HandleAddItemToList(c *gin.Context) {
+	itemId, err := controller_utils.GetIdFromParam(c, "itemId")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the item id from the url"})
+		return
+	}
+	listId, err := controller_utils.GetIdFromParam(c, "listId")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not get the list id from the url"})
+		return
+	}
+
+	userId, _ := c.Get("user_id")
+	err = itemCtrl.itemSrv.AddItemToList(c, userId.(int32), listId, itemId)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusAccepted, gin.H{"response": "item added"})
 }
